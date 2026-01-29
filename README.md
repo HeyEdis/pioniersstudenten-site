@@ -33,6 +33,8 @@ Make sure you have:
 
   - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
+> On linux you need to install docker and the docker-compose packages(look for instructions for your distro). If you want a GUI look into [Lazydocker](https://github.com/jesseduffield/lazydocker) or [Portrainer](https://github.com/portainer/portainer).
+
 ### Installing Bun
 
 On Linux/Mac
