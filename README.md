@@ -41,7 +41,7 @@ On Linux/Mac
 curl -fsSL https://bun.com/install | bash
 ```
 
-**Extra** step on Linux:
+**Extra** step on Linux(see the command for your distro):
 
 ```bash
 sudo apt install unzip
