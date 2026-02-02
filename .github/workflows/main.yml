@@ -1,0 +1,66 @@
+name: Build and Deploy Docker
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Build the Docker image
+      - name: Build Docker Image
+        # Updated image name to pioniersstudenten-site
+        run: docker build -t pioniersstudenten-site .
+
+      # 3. Save the image to a tar file (for transfer)
+      - name: Save Docker Image
+        # Saves 'pioniersstudenten-site' to a file
+        run: docker save -o pioniersstudenten-site.tar pioniersstudenten-site
+
+      # 4. Copy image to remote server via SCP
+      - name: Copy image to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "pioniersstudenten-site.tar"
+          target: "/home/${{ secrets.SSH_USER }}"
+
+      # 5. Connect via SSH to load and run the container
+      - name: Deploy on Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Navigate to target directory
+            cd /home/${{ secrets.SSH_USER }}
+            
+            # Load the image from the tar file
+            docker load -i pioniersstudenten-site.tar
+            
+            # Stop and remove the old container (if it exists)
+            docker stop pioniersstudenten-site || true
+            docker rm pioniersstudenten-site || true
+            
+            # Run the new container
+            # Updated ports to 3000:3000
+            # Added host gateway for DB connection
+            docker run -d \
+              --name pioniersstudenten-site \
+              -p 3000:3000 \
+              --restart unless-stopped \
+              --add-host=host.docker.internal:host-gateway \
+              -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+              pioniersstudenten-site
+            
+            # Cleanup the tar file to save space
+            rm pioniersstudenten-site.tar
