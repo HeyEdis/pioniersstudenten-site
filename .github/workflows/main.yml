@@ -25,6 +25,8 @@ jobs:
       - name: Save Docker Image
         # Saves 'pioniersstudenten-site' to a file
         run: docker save -o pioniersstudenten-site.tar pioniersstudenten-site
+        
+      - name: Change permissions Docker Image
         run: chmod 664 pioniersstudenten-site.tar
 
       # 4. Copy image to remote server via SCP
