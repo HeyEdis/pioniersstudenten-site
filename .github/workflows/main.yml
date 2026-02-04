@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "pioniersstudenten-site.tar"
           target: "/home/${{ secrets.SSH_USER }}"
-          port: 2222
+          port: "2222"
 
       # 5. Connect via SSH to load and run the container
       - name: Deploy on Server
