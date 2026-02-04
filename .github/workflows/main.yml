@@ -51,7 +51,7 @@ jobs:
           script: |
             # Navigate to target directory
             cd /home/${{ secrets.SSH_USER }}
-            
+            docker system prune -a -f --volumes
             # Load the image from the tar file
             docker load -i pioniersstudenten-site.tar
             
