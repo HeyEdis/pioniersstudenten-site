@@ -25,7 +25,7 @@ jobs:
       - name: Save Docker Image
         # Saves 'pioniersstudenten-site' to a file
         run: docker save -o pioniersstudenten-site.tar pioniersstudenten-site
-        
+
       - name: Change permissions Docker Image
         run: chmod 664 pioniersstudenten-site.tar
 
@@ -47,6 +47,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          port: "2222"
           script: |
             # Navigate to target directory
             cd /home/${{ secrets.SSH_USER }}
@@ -65,8 +66,6 @@ jobs:
               --name pioniersstudenten-site \
               -p 3000:3000 \
               --restart unless-stopped \
-              --add-host=host.docker.internal:host-gateway \
-              -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
               pioniersstudenten-site
             
             # Cleanup the tar file to save space
