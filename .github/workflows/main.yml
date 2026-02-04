@@ -25,6 +25,7 @@ jobs:
       - name: Save Docker Image
         # Saves 'pioniersstudenten-site' to a file
         run: docker save -o pioniersstudenten-site.tar pioniersstudenten-site
+        run: chmod 664 pioniersstudenten-site.tar
 
       # 4. Copy image to remote server via SCP
       - name: Copy image to server
@@ -35,6 +36,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "pioniersstudenten-site.tar"
           target: "/home/${{ secrets.SSH_USER }}"
+          port: 2222
 
       # 5. Connect via SSH to load and run the container
       - name: Deploy on Server
