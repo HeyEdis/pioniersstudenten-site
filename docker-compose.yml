@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:18.1
+    restart: always
+    environment:
+      POSTGRES_DB: '${POSTGRES_DB}'
+      POSTGRES_USER: '${POSTGRES_USERNAME}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - "3308:3306"
+
+  postgres_test:
+    image: postgres:18.1
+    restart: always
+    environment:
+      POSTGRES_DB: '${POSTGRES_TEST_DB}'
+      POSTGRES_USER: '${POSTGRES_TEST_USERNAME}'
+      POSTGRES_PASSWORD: '${POSTGRES_TEST_PASSWORD}'
+    volumes:
+      - postgres_test_data:/var/lib/postgresql
+    ports:
+      - "3309:3306"
+
+volumes:
+  postgres_data:
+  postgres_test_data:
