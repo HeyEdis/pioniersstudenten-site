@@ -9,7 +9,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
-      - "3308:3306"
+      - "5432:5432"
 
   postgres_test:
     image: postgres:18.1
@@ -21,7 +21,7 @@ services:
     volumes:
       - postgres_test_data:/var/lib/postgresql
     ports:
-      - "3309:3306"
+      - "5434:5432"
 
 volumes:
   postgres_data:
