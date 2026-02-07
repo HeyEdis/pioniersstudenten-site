@@ -14,10 +14,8 @@ services:
   postgres_test:
     image: postgres:18.1
     restart: always
-    environment:
-      POSTGRES_DB: '${POSTGRES_TEST_DB}'
-      POSTGRES_USER: '${POSTGRES_TEST_USERNAME}'
-      POSTGRES_PASSWORD: '${POSTGRES_TEST_PASSWORD}'
+    env_file:
+      - .env.test
     volumes:
       - postgres_test_data:/var/lib/postgresql
     ports:
