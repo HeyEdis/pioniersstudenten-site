@@ -78,7 +78,7 @@ bun dev
 Build application
 
 ```bash
-bun build
+bun run build
 ```
 
 Lint application
