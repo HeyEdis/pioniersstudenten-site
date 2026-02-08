@@ -13,8 +13,8 @@ CREATE TABLE "Admins" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "Admins_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"email" varchar(255) NOT NULL,
 	"password_hash" text NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp,
 	CONSTRAINT "Admins_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -26,7 +26,9 @@ CREATE TABLE "Events" (
 	"start_time" time NOT NULL,
 	"end_time" time NOT NULL,
 	"description" text NOT NULL,
-	"image" text
+	"image" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE "EventRegistrations" (
@@ -37,7 +39,7 @@ CREATE TABLE "EventRegistrations" (
 	"email" varchar(255) NOT NULL,
 	"phonenumber" varchar(14) NOT NULL,
 	"label" "pioneerLabel",
-	"created_at" timestamp DEFAULT now(),
+	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "EventRegistrations_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -45,8 +47,8 @@ CREATE TABLE "FAQ" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "FAQ_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"question" text NOT NULL,
 	"answer" text NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE "Members" (
@@ -59,8 +61,8 @@ CREATE TABLE "Members" (
 	"phonenumber" varchar(14) NOT NULL,
 	"has_payed" boolean,
 	"is_student" boolean,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp,
 	CONSTRAINT "Members_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -71,7 +73,8 @@ CREATE TABLE "Notifications" (
 	"title" varchar(200) NOT NULL,
 	"description" text NOT NULL,
 	"is_new" boolean DEFAULT true,
-	"created_at" timestamp DEFAULT now()
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE "Resources" (
@@ -79,8 +82,8 @@ CREATE TABLE "Resources" (
 	"type" "resourceTypes",
 	"title" varchar(200) NOT NULL,
 	"url" text NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp
 );
 --> statement-breakpoint
 ALTER TABLE "EventRegistrations" ADD CONSTRAINT "EventRegistrations_event_id_Events_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."Events"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

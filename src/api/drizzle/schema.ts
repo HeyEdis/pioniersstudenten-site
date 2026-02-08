@@ -5,6 +5,11 @@ export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning", "..."]);
 export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
 
+const timestamps = {
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at"),
+};
+
 export const members = pgTable("Members", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(), // so it autoincrements
   address_id: integer("address_id").references(() => address.id).notNull(), // given it an FK constraint
@@ -15,8 +20,7 @@ export const members = pgTable("Members", {
   phonenumber: varchar("phonenumber", {length:14}).notNull(),
   has_payed: boolean("has_payed"),
   is_student: boolean("is_student"),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  ...timestamps
 });
 
 // Many-to-one: maps the members adress_id to the address tables primary key.
@@ -44,8 +48,7 @@ export const faq = pgTable("FAQ", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(), 
   question: text("question").notNull(),
   answer: text("answer").notNull(),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  ...timestamps
 });
 
 export const resource = pgTable("Resources", {
@@ -53,16 +56,14 @@ export const resource = pgTable("Resources", {
   type: resourceTypes("type"),
   title: varchar("title", {length:200}).notNull(),
   url: text("url").notNull(),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  ...timestamps
 });
 
 export const admin = pgTable("Admins", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   email: varchar("email", {length: 255}).notNull().unique(),
   password_hash: text("password_hash").notNull(),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  ...timestamps
 });
 
 export const eventRegistration = pgTable("EventRegistrations", {
@@ -73,7 +74,7 @@ export const eventRegistration = pgTable("EventRegistrations", {
   email: varchar("email", {length: 255}).notNull().unique(),
   phonenumber: varchar("phonenumber", {length:14}).notNull(),
   label: pioneerLabel("label"),
-  created_at: timestamp("created_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Many-to-one: maps the event_id to the event table primary key.
@@ -93,6 +94,7 @@ export const event = pgTable("Events", {
   end_time: time("end_time").notNull(),
   description: text("description").notNull(),
   image: text("image"),
+  ...timestamps
 });
 
 // One event can have many eventRegistrations
@@ -107,7 +109,7 @@ export const notification = pgTable("Notifications", {
   title: varchar("title", {length:200}).notNull(),
   description: text("description").notNull(),
   is_new: boolean("is_new").default(true),
-  created_at: timestamp("created_at").defaultNow(),
+  ...timestamps
 });
 
 export const notificationRelations = relations(notification, ({one}) => ({

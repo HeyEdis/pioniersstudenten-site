@@ -29,11 +29,11 @@
 
 Make sure you have:
 
-- **Docker (if you prefer containerized dev envs)**
+- **Docker**
 
   - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-> On linux you need to install docker and the docker-compose packages(look for instructions for your distro). If you want a GUI look into [Lazydocker](https://github.com/jesseduffield/lazydocker) or [Portrainer](https://github.com/portainer/portainer).
+> On linux you need to install docker and the docker-compose packages(look for instructions for your distro). If you want a GUI look into [Lazydocker](https://github.com/jesseduffield/lazydocker), [Portrainer](https://github.com/portainer/portainer), [Podman](https://github.com/podman-desktop/podman-desktop) or something else.
 
 ### Installing Bun
 
@@ -91,8 +91,7 @@ bun lint
 
 ## Migrations
 
-If you have changed the schema.ts file, you need to apply those schema changes to the database.
-To do this generate first a migration file and afterwards apply it. However, if there is a team working on this project. Let the Project Lead know that a migration is needed for your pull request.
+If you have changed the schema.ts file, you need to apply those schema changes to the database. However, if there is a team working on this project. Let the Project Lead know that a migration is needed for your pull request. They will generate a migration once your PR is merged.
 
 First step:
 
