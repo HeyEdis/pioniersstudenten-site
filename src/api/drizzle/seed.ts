@@ -1,21 +1,39 @@
 import { db } from "../core/db";
+import { sql } from "drizzle-orm";
 import * as schema from "./schema";
 import { genderTypes, resourceTypes, pioneerLabel } from "./schema";
 
 const password = "wachtwoord123";
 
 async function main() {
+    
+    // Clear existing data
+    console.log("Cleaning up database.");
+    await db.delete(schema.notification);
+    await db.delete(schema.eventRegistration);
+    await db.delete(schema.members);
+    
+    await db.delete(schema.event);
+    await db.delete(schema.address);
 
-// for (let i = 1; i <= 6; i++) {
-//     const offset = (i - 1) * 5;
-//     for (let j = 1; j < 5; j++) {
-//       const housenumber = j + offset;
+    await db.delete(schema.admin);
+    await db.delete(schema.resource);
+    await db.delete(schema.faq);
 
-
-//     }
-// }
-
-
+    await db.execute(sql`
+        TRUNCATE TABLE 
+            "Notifications", 
+            "EventRegistrations", 
+            "Members", 
+            "Events", 
+            "Addresses", 
+            "Admins", 
+            "Resources", 
+            "FAQ" 
+        RESTART IDENTITY CASCADE
+`);
+    
+    console.log("🌱 Seeding database...");
     const admin: typeof schema.admin.$inferInsert = {
         email: "admin@example.com",
         password_hash: await Bun.password.hash(password)
@@ -400,7 +418,9 @@ async function main() {
 
     await db.insert(schema.notification).values(notifications);
     console.log("Notifications created!");
+    console.log("✅ Seeding complete!");
 
 }
 
-main();
+
+main().catch(console.error);
