@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm";
 import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar } from "drizzle-orm/pg-core";
 
-const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
-const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning", "..."]);
-const pioneerLabel = pgEnum("guestRoles",["Toekomstige pioniersstudent", "Pioniersstudent"]);
+export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
+export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning", "..."]);
+export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
 
 export const members = pgTable("Members", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(), // so it autoincrements
@@ -72,7 +72,7 @@ export const eventRegistration = pgTable("EventRegistrations", {
   lastname: varchar("lastname", {length: 50}).notNull(),
   email: varchar("email", {length: 255}).notNull().unique(),
   phonenumber: varchar("phonenumber", {length:14}).notNull(),
-  label: pioneerLabel("label").notNull(),
+  label: pioneerLabel("label"),
   created_at: timestamp("created_at").defaultNow(),
 });
 
@@ -86,7 +86,7 @@ export const eventRegistrationsRelations = relations(eventRegistration, ({one}) 
 
 export const event = pgTable("Events", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  label: pioneerLabel("label").notNull(),
+  label: pioneerLabel("label"),
   title: varchar("title", {length:200}).notNull(),
   date: date("date").notNull(),
   start_time: time("start_time").notNull(),

@@ -89,6 +89,23 @@ bun lint
 
 > If `--bun` is used in a script commando in `package.json` then bun is used as runtime instead of node!
 
+## Migrations
+
+If you have changed the schema.ts file, you need to apply those schema changes to the database.
+To do this generate first a migration file and afterwards apply it. However, if there is a team working on this project. Let the Project Lead know that a migration is needed for your pull request.
+
+First step:
+
+```bash
+bun db:generate
+```
+
+Second step:
+
+```bash
+bun db:migrate
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
