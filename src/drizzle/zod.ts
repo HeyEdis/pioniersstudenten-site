@@ -3,12 +3,12 @@ import { address, members, faq, resource, admin, registrations, event, notificat
 import { z } from "zod";
 
 /**
- * see: https://orm.drizzle.team/docs/zod
+ * SEE: https://orm.drizzle.team/docs/zod
  * The createSelect/Insert/Update schema imports, create validation schema's to be used throughout the project.
  * 
- * Select schema: Defines the shape of data queried from the database - can be used to validate API responses.
- * Insert schema: Defines the shape of data to be inserted into the database - can be used to validate API requests.
- * Update schema: Defines the shape of data to be updated in the database - can be used to validate API requests.
+ * SELECT schema: Defines the shape of data queried from the database - can be used to validate API responses.
+ * INSERT schema: Defines the shape of data to be inserted into the database - can be used to validate API requests.
+ * UPDATE schema: Defines the shape of data to be updated in the database - can be used to validate API requests.
  */
 
 export const MemberSelectSchema = createSelectSchema(members);
@@ -42,14 +42,14 @@ export const GenderEnumSchema = z.enum(genderTypes.enumValues)
 export const ResourceEnumSchema = z.enum(resourceTypes.enumValues)
 export const PioneerEnumSchema = z.enum(pioneerLabel.enumValues)
 
-/*export type Member = z.infer<typeof MemberSelectSchema>;
+export type Member = z.infer<typeof MemberSelectSchema>;
 export type Address = z.infer<typeof AddressSelectSchema>;
 export type FAQ = z.infer<typeof FaqSelectSchema>;
 export type Resource = z.infer<typeof ResourceSelectSchema>;
 export type Admin = z.infer<typeof AdminSelectSchema>;
 export type Registration = z.infer<typeof RegistrationSelectSchema>;
 export type Event = z.infer<typeof EventSelectSchema>;
-export type Notification = z.infer<typeof NotificationSelectSchema>;*/
+export type Notification = z.infer<typeof NotificationSelectSchema>;
 
 export type GenderEnum = z.infer<typeof GenderEnumSchema>;
 export type ResourceType = z.infer<typeof ResourceEnumSchema>;
