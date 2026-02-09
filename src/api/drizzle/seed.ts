@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import * as schema from "./schema";
 import { genderTypes, resourceTypes, pioneerLabel, userRole } from "./schema";
 import { fakerNL_BE as faker } from "@faker-js/faker";
+import dayjs from "dayjs";
 
 const password = "wachtwoord123";
 
@@ -185,7 +186,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[0],
             title: "Infodag: Starten als Eerste in je Familie",
-            date: "2026-09-05",
+            date: dayjs().add(5, "days").toDate().toDateString(),
             start_time: "10:00:00",
             end_time: "14:00:00",
             description: "Een algemene introductiedag voor studenten die als eerste in hun gezin aan het hoger onderwijs beginnen. Ontdek de weg naar de campus!",
@@ -194,7 +195,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[1],
             title: "Workshop: Meester worden van het Leerplatform",
-            date: "2026-09-20",
+            date: dayjs().add(1, "month").add(15, "days").toDate().toDateString(),
             start_time: "14:00:00",
             end_time: "16:30:00",
             description: "Een diepe duik in Canvas en andere schoolplatformen. Hoe download je cursussen en stuur je professionele e-mails?",
@@ -203,7 +204,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[1],
             title: "Masterclass: Plannen en Structuur",
-            date: "2026-10-02",
+            date: dayjs().add(2, "month").add(4, "days").toDate().toDateString(),
             start_time: "18:30:00",
             end_time: "20:30:00",
             description: "Van blok-schema tot dagindeling. Leer hoe je de enorme berg leerstof van het hoger onderwijs overzichtelijk houdt.",
@@ -212,7 +213,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[1],
             title: "Online Q&A: Verwachtingen vs. Realiteit",
-            date: "2026-08-15",
+            date: dayjs().add(2, "month").add(9, "days").toDate().toDateString(),
             start_time: "19:00:00",
             end_time: "20:00:00",
             description: "Wat verandert er echt na het middelbaar? Stel al je vragen aan ervaren pioniersstudenten uit hogere jaren.",
@@ -221,7 +222,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[0],
             title: "Netwerkavond: Bouw je Sociale Kring",
-            date: "2026-10-15",
+            date: dayjs().add(2, "month").add(16, "days").toDate().toDateString(),
             start_time: "19:30:00",
             end_time: "22:00:00",
             description: "Een informele avond om medestudenten te leren kennen. Je sociale netwerk is je belangrijkste vangnet tijdens je studies.",
@@ -230,7 +231,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[1],
             title: "Focus-sessie: Effectief Studeren",
-            date: "2026-11-10",
+            date: dayjs().add(3, "month").toDate().toDateString(),
             start_time: "09:00:00",
             end_time: "12:00:00",
             description: "Samen studeren werkt motiverend. We passen de Pomodoro-techniek toe en wisselen studietips uit.",
@@ -239,7 +240,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[0],
             title: "Rondleiding: Navigeren op de Campus",
-            date: "2026-09-12",
+            date: dayjs().add(3, "month").add(9, "days").toDate().toDateString(),
             start_time: "13:00:00",
             end_time: "15:00:00",
             description: "Waar is de bib? Hoe werkt de resto? We verkennen samen de belangrijkste plekken van de hogeschool/universiteit.",
@@ -248,7 +249,7 @@ async function main() {
         {
             label: pioneerLabel.enumValues[1],
             title: "Pre-Exam Stress Relief",
-            date: "2026-12-15",
+            date: dayjs().add(2, "weeks").toDate().toDateString(),
             start_time: "17:00:00",
             end_time: "19:00:00",
             description: "Ontspan voor de blok begint. Sessie over mentale gezondheid, slaaphygiëne en omgaan met faalangst.",
