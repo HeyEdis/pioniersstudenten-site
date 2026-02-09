@@ -109,12 +109,12 @@ async function main() {
         {
             type: resourceTypes.enumValues[0],
             title: "Handleiding Canvas/Minerva Leerplatform",
-            url: "https://icts.kuleuven.be/docs/at/pintra/canvas",
+            url: "https://kuleuven.be/docs/at/pintra/canvas",
         },
         {
             type: resourceTypes.enumValues[1],
             title: "Financiële steun en Beurzen (Stuvo)",
-            url: "https://www.centenvoorstudenten.be",
+            url: "https://www.centervoorstudenten.be",
         },
         {
             type: resourceTypes.enumValues[1],
