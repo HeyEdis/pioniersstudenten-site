@@ -4,6 +4,8 @@
 
 - [Next.js](https://nextjs.org/) - Fullstack.
 - [React](https://react.dev/) - Utilises React as a Frontend.
+- [Docker](https://www.docker.com/products/docker-desktop/) - To run local containers of the database.
+- [Bun](https://bun.com/) - All in one toolkit: bundler, javascript runtime, testrunner and package manager.
 - [Betterauth](https://www.better-auth.com/) - Authentication.
 - [Postgress](https://www.postgresql.org/) - Open source relational database.
 - [Drizzle ORM](https://orm.drizzle.team/) - Map entities to database tables.
@@ -20,8 +22,7 @@
 - [Recharts](https://github.com/recharts/recharts) - Chart library.
 - [Slick-carousel](https://github.com/kenwheeler/slick) - Carousel.
 - [Day.js](https://github.com/iamkun/dayjs) - Immutable date-time library.
-- [Docker](https://www.docker.com/products/docker-desktop/) - To run local containers of the database.
-- [Bun](https://bun.com/) - All in one toolkit: bundler, javascript runtime, testrunner and package manager.
+- [Faker](https://v10.fakerjs.dev/) - For generating mock data.
 
 ## Installation Instructions
 

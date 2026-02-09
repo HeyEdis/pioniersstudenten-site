@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
-export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning", "..."]);
+export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
 export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
 
 const timestamps = {
@@ -10,7 +10,7 @@ const timestamps = {
   updated_at: timestamp("updated_at"),
 };
 
-export const members = pgTable("Members", {
+export const members = pgTable("members", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(), // so it autoincrements
   address_id: integer("address_id").references(() => address.id).notNull(), // given it an FK constraint
   firstname: varchar("firstname", {length: 50}).notNull(),
@@ -31,7 +31,7 @@ export const membersRelations = relations(members, ({one}) => ({
   }),
 }))
 
-export const address = pgTable("Addresses", {
+export const address = pgTable("addresses", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(), 
   street: varchar("street", {length: 255}).notNull(),
   housenumber: varchar("housenumber", {length: 10}).notNull(),
@@ -44,14 +44,14 @@ export const addressRelations = relations(address, ({many}) => ({
   members: many(members),
 }));
 
-export const faq = pgTable("FAQ", {
+export const faq = pgTable("faq", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(), 
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   ...timestamps
 });
 
-export const resource = pgTable("Resources", {
+export const resource = pgTable("resources", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   type: resourceTypes("type"),
   title: varchar("title", {length:200}).notNull(),
@@ -59,14 +59,14 @@ export const resource = pgTable("Resources", {
   ...timestamps
 });
 
-export const admin = pgTable("Admins", {
+export const admin = pgTable("admins", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   email: varchar("email", {length: 255}).notNull().unique(),
   password_hash: text("password_hash").notNull(),
   ...timestamps
 });
 
-export const eventRegistration = pgTable("EventRegistrations", {
+export const registrations = pgTable("registrations", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   event_id: integer("event_id").references(() => event.id).notNull(), // given the id an FK constraint
   firstname: varchar("firstname", {length: 50}).notNull(),
@@ -78,14 +78,14 @@ export const eventRegistration = pgTable("EventRegistrations", {
 });
 
 // Many-to-one: maps the event_id to the event table primary key.
-export const eventRegistrationsRelations = relations(eventRegistration, ({one}) => ({
+export const registrationRelations = relations(registrations, ({one}) => ({
   event: one(event, {
-    fields: [eventRegistration.event_id],
+    fields: [registrations.event_id],
     references: [event.id],
   }),
 }))
 
-export const event = pgTable("Events", {
+export const event = pgTable("events", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   label: pioneerLabel("label"),
   title: varchar("title", {length:200}).notNull(),
@@ -99,13 +99,13 @@ export const event = pgTable("Events", {
 
 // One event can have many eventRegistrations
 export const eventRelations = relations(event, ({many}) => ({
-  eventRegistration: many(eventRegistration),
+  registration: many(registrations),
 }));
 
-export const notification = pgTable("Notifications", {
+export const notification = pgTable("notifications", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   member_id: integer("member_id").references(() => members.id), // given the id an FK constraint,
-  eventRegistration_id: integer("eventRegistration_id").references(() => eventRegistration.id), // given the id an FK constraint,
+  registration_id: integer("registration_id").references(() => registrations.id), // given the id an FK constraint,
   title: varchar("title", {length:200}).notNull(),
   description: text("description").notNull(),
   is_new: boolean("is_new").default(true),
@@ -118,8 +118,8 @@ export const notificationRelations = relations(notification, ({one}) => ({
     references: [members.id],
   }),
 
-  eventRegistration: one(eventRegistration, {
-    fields: [notification.eventRegistration_id],
-    references: [eventRegistration.id],
+  registration: one(registrations, {
+    fields: [notification.registration_id],
+    references: [registrations.id],
   }),
 }));

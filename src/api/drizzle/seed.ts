@@ -2,6 +2,7 @@ import { db } from "../core/db";
 import { sql } from "drizzle-orm";
 import * as schema from "./schema";
 import { genderTypes, resourceTypes, pioneerLabel } from "./schema";
+import { fakerNL_BE as faker } from "@faker-js/faker";
 
 const password = "wachtwoord123";
 
@@ -10,7 +11,7 @@ async function main() {
     // Clear existing data
     console.log("Cleaning up database.");
     await db.delete(schema.notification);
-    await db.delete(schema.eventRegistration);
+    await db.delete(schema.registrations);
     await db.delete(schema.members);
     
     await db.delete(schema.event);
@@ -20,18 +21,22 @@ async function main() {
     await db.delete(schema.resource);
     await db.delete(schema.faq);
 
+    /** 
+     * After deleting all the data the id's don't reset to 1. 
+     * To do this this piece of sql code needs to be executed.
+     * */ 
     await db.execute(sql`
         TRUNCATE TABLE 
-            "Notifications", 
-            "EventRegistrations", 
-            "Members", 
-            "Events", 
-            "Addresses", 
-            "Admins", 
-            "Resources", 
-            "FAQ" 
+            "notifications", 
+            "registrations", 
+            "members", 
+            "events", 
+            "addresses", 
+            "admins", 
+            "resources", 
+            "faq" 
         RESTART IDENTITY CASCADE
-`);
+    `);
     
     console.log("🌱 Seeding database...");
     const admin: typeof schema.admin.$inferInsert = {
@@ -384,23 +389,24 @@ async function main() {
     await db.insert(schema.event).values(events);
     console.log("Events created!");
 
-    const eventRegistrations: (typeof schema.eventRegistration.$inferInsert)[] = [];
+    const registrations: (typeof schema.registrations.$inferInsert)[] = [];
 
     for (let i = 1; i <= 8; i++) {
-    const eventId = i;
-        for (let j = 1; j <= 5; j++) {
-            eventRegistrations.push({
+        const eventId = i;
+        const randomCount = Math.floor(Math.random() * 26);
+        for (let j = 1; j <= randomCount; j++) {
+            registrations.push({
                 event_id: eventId,
-                firstname: `Student_${j}`,
-                lastname: `Pionier_${i}`,
+                firstname: faker.person.firstName(),
+                lastname: faker.person.lastName(),
                 email: `student_${i}_${j}@example.com`, 
-                phonenumber: "0488888888",
+                phonenumber: faker.phone.number({ style: "international" }),
                 label: i % 2 === 0 ? pioneerLabel.enumValues[1] : pioneerLabel.enumValues[0]
             });
         }
     }
 
-    await db.insert(schema.eventRegistration).values(eventRegistrations);
+    await db.insert(schema.registrations).values(registrations);
     console.log("Users have been registered to events!");
 
     const notifications: (typeof schema.notification.$inferInsert)[] = [];
@@ -409,7 +415,7 @@ async function main() {
         const isMember = i % 2 === 0
         notifications.push({
             member_id: isMember ? i : null,
-            eventRegistration_id: !isMember ? i : null,
+            registration_id: !isMember ? i : null,
             title:"",
             description: isMember ? "Nieuwe Betaling" : "Nieuwe Inschrijving",
             is_new: i % 2 == 0 ? true : false
@@ -419,7 +425,6 @@ async function main() {
     await db.insert(schema.notification).values(notifications);
     console.log("Notifications created!");
     console.log("✅ Seeding complete!");
-
 }
 
 
