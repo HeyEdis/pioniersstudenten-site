@@ -4,6 +4,7 @@ import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
 export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
+export const userRole = pgEnum("userRole", ["Admin"]);
 
 const timestamps = {
   created_at: timestamp("created_at").defaultNow().notNull(),
@@ -62,6 +63,7 @@ export const resource = pgTable("resources", {
 export const admin = pgTable("admins", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   email: varchar("email", {length: 255}).notNull().unique(),
+  role: userRole(),
   password_hash: text("password_hash").notNull(),
   ...timestamps
 });

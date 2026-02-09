@@ -1,7 +1,7 @@
 import { db } from "../core/db";
 import { sql } from "drizzle-orm";
 import * as schema from "./schema";
-import { genderTypes, resourceTypes, pioneerLabel } from "./schema";
+import { genderTypes, resourceTypes, pioneerLabel, userRole } from "./schema";
 import { fakerNL_BE as faker } from "@faker-js/faker";
 
 const password = "wachtwoord123";
@@ -41,7 +41,8 @@ async function main() {
     console.log("🌱 Seeding database...");
     const admin: typeof schema.admin.$inferInsert = {
         email: "admin@example.com",
-        password_hash: await Bun.password.hash(password)
+        password_hash: await Bun.password.hash(password),
+        role: userRole.enumValues[0]
     };
 
     await db.insert(schema.admin).values(admin);
@@ -139,176 +140,45 @@ async function main() {
     await db.insert(schema.resource).values(resources);    
     console.log("Resources created!");
 
-    const addresses: (typeof schema.address.$inferInsert)[] = [
-        {
-            street: "Adolphe Pégoudlaan",
-            housenumber: "12",
-            city: "Sint-Denijs-Westrem",
+    /**
+     * Address id's get stored so they can be used when generating members.
+     * To get the id's we need to use .returning()
+     */
+    const addressIds: number[] = [];
+    for (let i = 0; i < 14; i++){
+        const [address] =  await db.insert(schema.address).values({
+            street: faker.location.street(),
+            housenumber: faker.number.int({min: 1, max: 300}).toString(),
+            city: faker.location.city(),
             province: "Oost-vlaanderen"
-        },
-        {
-            street: "Heerweg-Noord",
-            housenumber: "25",
-            city: "Zwijnaarde",
-            province: "Oost-vlaanderen"
-        },
-        {
-            street: "Wondelgemstraat",
-            housenumber: "88",
-            city: "Wondelgem",
-            province: "Oost-vlaanderen"
-        },
-        {
-            street: "Kasteellaan",
-            housenumber: "3",
-            city: "Evergem",
-            province: "Oost-vlaanderen"
-        },
-        {
-            street: "Dorp",
-            housenumber: "15",
-            city: "Sint-Martens-Latem",
-            province: "Oost-vlaanderen"
-        },
-        {
-            street: "Antwerpsesteenweg",
-            housenumber: "210",
-            city: "Lochristi",
-            province: "Oost-vlaanderen"
-        },
-        {
-            street: "Kerkstraat",
-            housenumber: "44",
-            city: "Mariakerke",
-            province: "Oost-vlaanderen"
-        },
-        {
-            street: "Voskenslaan",
-            housenumber: "156",
-            city: "Gent",
-            province: "Oost-vlaanderen"
-        },
-        {
-            street: "Nationalestraat",
-            housenumber: "28",
-            city: "Antwerpen",
-            province: "Antwerpen"
-        },
-        {
-            street: "Keizersplein",
-            housenumber: "11",
-            city: "Aalst",
-            province: "Oost-vlaanderen"
-        }
-    ];
+        })
+        .returning();
+        addressIds.push(address.id);
+    }
 
-    await db.insert(schema.address).values(addresses);    
     console.log("Addresses created!");
 
-    const members: (typeof schema.members.$inferInsert)[] = [
-        {
-            address_id: 1,
-            firstname: "Luc",
-            lastname: "Brechtens",
-            gender: genderTypes.enumValues[0],
-            email: "luc@example.com",
-            phonenumber:"0496568758",
-            has_payed: false,
-            is_student: true
-        },
-        {
-            address_id: 2,
-            firstname: "Lars",
-            lastname: "Peeters",
-            gender: genderTypes.enumValues[0],
-            email: "lars@gmail.com",
-            phonenumber: "0476987654",
-            has_payed: false,
-            is_student: true
-        },
-        {
-            address_id: 3,
-            firstname: "Sam",
-            lastname: "Vandamme",
-            gender: genderTypes.enumValues[1],
-            email: "sam@example.com",
-            phonenumber: "0499112233",
-            has_payed: true,
-            is_student: false
-        },
-        {
-            address_id: 4,
-            firstname: "Fatima",
-            lastname: "Zahra",
-            gender: genderTypes.enumValues[1],
-            email: "zahra@example.com",
-            phonenumber: "0488556677",
-            has_payed: true,
-            is_student: true
-        },
-        {
-            address_id: 5,
-            firstname: "Kobe",
-            lastname: "Willems",
-            gender: genderTypes.enumValues[0],
-            email: "kobe@example.com",
-            phonenumber: "0470443322",
-            has_payed: false,
-            is_student: true
-        },
-        {
-            address_id: 6,
-            firstname: "Elena",
-            lastname: "Popov",
-            gender: genderTypes.enumValues[1],
-            email: "elena@example.com",
-            phonenumber: "0495112244",
-            has_payed: true,
-            is_student: false
-        },
-        {
-            address_id: 7,
-            firstname: "Jean",
-            lastname: "Dupont",
-            gender: genderTypes.enumValues[0],
-            email: "jean@example.com",
-            phonenumber: "0484998877",
-            has_payed: false,
-            is_student: false
-        },
-        {
-            address_id: 8,
-            firstname: "Meryem",
-            lastname: "Ait",
-            gender: genderTypes.enumValues[1],
-            email: "m.ait@student.hogent.be",
-            phonenumber: "0477123987",
-            has_payed: true,
-            is_student: true
-        },
-        {
-            address_id: 9,
-            firstname: "Alex",
-            lastname: "Jansen",
-            gender: genderTypes.enumValues[1],
-            email: "alex@example.com",
-            phonenumber: "0492887766",
-            has_payed: true,
-            is_student: true
-        },
-        {
-            address_id: 10,
-            firstname: "Bram",
-            lastname: "De Smet",
-            gender: genderTypes.enumValues[0],
-            email: "bram.desmet@gmail.com",
-            phonenumber: "0471554433",
-            has_payed: false,
-            is_student: true
+    /**
+     * Gets generated in an array and then in bulk it gets inserted into the DB
+     * This is done so it does one db operation instead of n
+     */
+    const allMembers: (typeof schema.members.$inferInsert)[] = [];
+    for (const id of addressIds){
+        for (let i = 0; i < 5; i++) {
+            allMembers.push({
+                address_id: id,
+                firstname: faker.person.firstName(),
+                lastname: faker.person.lastName(),
+                gender: id % 2 == 0 ? genderTypes.enumValues[0] : genderTypes.enumValues[1],
+                email: faker.internet.email(),
+                phonenumber: faker.phone.number({style: "international"}),
+                has_payed: id % 2 == 0 ? true : false,
+                is_student: id % 2 == 0 ? true : false,
+            })
         }
-    ];
+    }
 
-    await db.insert(schema.members).values(members);
+    await db.insert(schema.members).values(allMembers);
     console.log("Members created!");
 
     const events: (typeof schema.event.$inferInsert)[] = [

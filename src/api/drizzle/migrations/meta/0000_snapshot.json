@@ -1,5 +1,5 @@
 {
-  "id": "f109aba5-446e-4a71-be2c-5124e698131b",
+  "id": "1359ff38-13cc-41e3-9801-2f44615da819",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -84,6 +84,13 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "userRole",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
         },
         "password_hash": {
           "name": "password_hash",
@@ -660,6 +667,13 @@
       "values": [
         "Studentenlink",
         "Ondersteuning"
+      ]
+    },
+    "public.userRole": {
+      "name": "userRole",
+      "schema": "public",
+      "values": [
+        "Admin"
       ]
     }
   },
