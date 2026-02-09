@@ -36,6 +36,12 @@ Make sure you have:
 
 > On linux you need to install docker and the docker-compose packages(look for instructions for your distro). If you want a GUI look into [Lazydocker](https://github.com/jesseduffield/lazydocker), [Portrainer](https://github.com/portainer/portainer), [Podman](https://github.com/podman-desktop/podman-desktop) or something else.
 
+### Usefull GUI
+
+To check upon the seeded data in your local docker container it's usefull to install [pgAdmin](https://www.pgadmin.org/). It's a tool to look into your database and perform querries, generate ERD diagrams, etc.
+
+Alternativly you can go into the docker GUI to the exec tab and execute `psql -U postgres -d pioniersstudenten` to connect to postgresSQL and then list all the tables with `\dt` and query the data with `SELECT * from events`.
+
 ### Installing Bun
 
 On Linux/Mac
@@ -106,6 +112,35 @@ Second step:
 bun db:migrate
 ```
 
+## Environment variables
+
+To setup the docker containers, make a `.env` and an `.env.test` file.
+
+Example .env config:
+
+```bash
+APP_ENV=development
+
+POSTGRES_DB=pioniersstudenten
+POSTGRES_USERNAME=postgres
+POSTGRES_PASSWORD=kiesEenWachtwoord
+
+DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
+```
+
+Example .env.test config:
+
+```bash
+APP_ENV=testing
+
+POSTGRES_DB=pioniersstudenten-test
+POSTGRES_USER=test
+POSTGRES_PASSWORD=kiesEenWachtwoord
+TZ=Europe/Brussels
+
+DATABASE_URL=postgres://test:kiesEenWachtwoord@localhost:5434/pioniersstudenten-test
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -114,7 +149,3 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## FYI
-
-Nextjs gebruikt file based routing. Dus de naam van de volder in de /app map wordt de naam van de endpoint. In deze folder moet altijd een page.tsx file zitten en moet altijd page.tsx noemen
