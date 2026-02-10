@@ -6,22 +6,21 @@ services:
       POSTGRES_DB: '${POSTGRES_DB}'
       POSTGRES_USER: '${POSTGRES_USERNAME}'
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      TZ: Europe/Brussels
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
-      - "3308:3306"
+      - "5432:5432"
 
   postgres_test:
     image: postgres:18.1
     restart: always
-    environment:
-      POSTGRES_DB: '${POSTGRES_TEST_DB}'
-      POSTGRES_USER: '${POSTGRES_TEST_USERNAME}'
-      POSTGRES_PASSWORD: '${POSTGRES_TEST_PASSWORD}'
+    env_file:
+      - .env.test
     volumes:
       - postgres_test_data:/var/lib/postgresql
     ports:
-      - "3309:3306"
+      - "5434:5432"
 
 volumes:
   postgres_data:

@@ -4,6 +4,8 @@
 
 - [Next.js](https://nextjs.org/) - Fullstack.
 - [React](https://react.dev/) - Utilises React as a Frontend.
+- [Docker](https://www.docker.com/products/docker-desktop/) - To run local containers of the database.
+- [Bun](https://bun.com/) - All in one toolkit: bundler, javascript runtime, testrunner and package manager.
 - [Betterauth](https://www.better-auth.com/) - Authentication.
 - [Postgress](https://www.postgresql.org/) - Open source relational database.
 - [Drizzle ORM](https://orm.drizzle.team/) - Map entities to database tables.
@@ -20,8 +22,7 @@
 - [Recharts](https://github.com/recharts/recharts) - Chart library.
 - [Slick-carousel](https://github.com/kenwheeler/slick) - Carousel.
 - [Day.js](https://github.com/iamkun/dayjs) - Immutable date-time library.
-- [Docker](https://www.docker.com/products/docker-desktop/) - To run local containers of the database.
-- [Bun](https://bun.com/) - All in one toolkit: bundler, javascript runtime, testrunner and package manager.
+- [Faker](https://v10.fakerjs.dev/) - For generating mock data.
 
 ## Installation Instructions
 
@@ -29,11 +30,17 @@
 
 Make sure you have:
 
-- **Docker (if you prefer containerized dev envs)**
+- **Docker**
 
   - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-> On linux you need to install docker and the docker-compose packages(look for instructions for your distro). If you want a GUI look into [Lazydocker](https://github.com/jesseduffield/lazydocker) or [Portrainer](https://github.com/portainer/portainer).
+> On linux you need to install docker and the docker-compose packages(look for instructions for your distro). If you want a GUI look into [Lazydocker](https://github.com/jesseduffield/lazydocker), [Portrainer](https://github.com/portainer/portainer), [Podman](https://github.com/podman-desktop/podman-desktop) or something else.
+
+### Usefull GUI
+
+To check upon the seeded data in your local docker container it's usefull to install [pgAdmin](https://www.pgadmin.org/). It's a tool to look into your database and perform querries, generate ERD diagrams, etc.
+
+Alternativly you can go into the docker GUI to the exec tab and execute `psql -U postgres -d pioniersstudenten` to connect to postgresSQL and then list all the tables with `\dt` and query the data with `SELECT * from events`.
 
 ### Installing Bun
 
@@ -78,7 +85,7 @@ bun dev
 Build application
 
 ```bash
-bun build
+bun run build
 ```
 
 Lint application
@@ -89,6 +96,51 @@ bun lint
 
 > If `--bun` is used in a script commando in `package.json` then bun is used as runtime instead of node!
 
+## Migrations
+
+If you have changed the schema.ts file, you need to apply those schema changes to the database. However, if there is a team working on this project. Let the Project Lead know that a migration is needed for your pull request. They will generate a migration once your PR is merged.
+
+First step:
+
+```bash
+bun db:generate
+```
+
+Second step:
+
+```bash
+bun db:migrate
+```
+
+## Environment variables
+
+To setup the docker containers, make a `.env` and an `.env.test` file.
+
+Example .env config:
+
+```bash
+APP_ENV=development
+
+POSTGRES_DB=pioniersstudenten
+POSTGRES_USERNAME=postgres
+POSTGRES_PASSWORD=kiesEenWachtwoord
+
+DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
+```
+
+Example .env.test config:
+
+```bash
+APP_ENV=testing
+
+POSTGRES_DB=pioniersstudenten-test
+POSTGRES_USER=test
+POSTGRES_PASSWORD=kiesEenWachtwoord
+TZ=Europe/Brussels
+
+DATABASE_URL=postgres://test:kiesEenWachtwoord@localhost:5434/pioniersstudenten-test
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -97,7 +149,3 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## FYI
-
-Nextjs gebruikt file based routing. Dus de naam van de volder in de /app map wordt de naam van de endpoint. In deze folder moet altijd een page.tsx file zitten en moet altijd page.tsx noemen
