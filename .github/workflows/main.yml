@@ -2,7 +2,7 @@ name: Build and Deploy Docker
 
 on:
   push:
-    branches: [ "github-actions" ]
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: github-actions
+          ref: main
       # 1. Checkout the code
       # - name: Checkout code
       #   uses: actions/checkout@v4
