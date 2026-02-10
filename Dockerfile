@@ -17,6 +17,13 @@ COPY . .
 # This runs "bun --bun next build" based on your package.json
 RUN bun run build
 
+RUN cp -r public .next/standalone/public
+
+# 2. Create the .next directory inside standalone
+RUN mkdir -p .next/standalone/.next
+
+# 3. Copy the static assets (CSS, JS chunks)
+RUN cp -r .next/static .next/standalone/.next/static
 # Expose the port
 EXPOSE 3000
 
