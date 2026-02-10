@@ -1,3 +1,3 @@
-export default function Evenementen() {
+export default function About() {
   return <div>About</div>
 }
