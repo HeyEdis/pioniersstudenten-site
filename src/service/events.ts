@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import ServiceError from "@/core/serviceError";
 
 export const create = async(params: typeof event.$inferInsert) :  Promise<Event> => {
-    if(!params){throw ServiceError.notFound("De paramaters zijn leeg.")}
+    if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")}
     if(!params.label){throw new Error("Label is leeg.")}
     if(!params.title){throw new Error("Titel is leeg.")}
     if(!params.date){throw new Error("Datum is leeg.")}
@@ -30,9 +30,7 @@ export const getAll = async() : Promise<Event[]> => {
 };
 
 export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
-    if(!label){
-        throw ServiceError.notFound("Het label heeft geen waarde.")
-    }
+    if(!label){throw ServiceError.notFound("Het label heeft geen waarde.")}
 
     return await db.select()
     .from(event)
@@ -40,13 +38,15 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
 };
 
 export const updateById = async(eventId : number, params: typeof event.$inferInsert) : Promise<Event> => {
-    if (!eventId){
-        throw ServiceError.notFound("Er is geen id van dit event.")
-    }
+    if (!eventId){throw ServiceError.notFound("Er is geen id van dit event.")}
 
-    if(!params){
-        throw ServiceError.notFound("De paramaters zijn leeg.")
-    }
+    if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")}
+    if(!params.label){throw new Error("Label is leeg.")}
+    if(!params.title){throw new Error("Titel is leeg.")}
+    if(!params.date){throw new Error("Datum is leeg.")}
+    if(!params.start_time){throw new Error("Starttijd is leeg.")}
+    if(!params.end_time){throw new Error("Eindtijd is leeg.")}
+    if(!params.description){throw new Error("Omschrijving is leeg.")}
     
     try {
         const [updatedEvent] =  await db.update(event)
@@ -66,10 +66,7 @@ export const updateById = async(eventId : number, params: typeof event.$inferIns
 };
 
 export const deleteById = async(eventId: number) : Promise<void> => {
-
-    if (!eventId){
-        throw ServiceError.notFound("Er is geen id van dit event.")
-    }
+    if (!eventId){throw ServiceError.notFound("Er is geen id van dit event.")}
 
     try{
         await db.delete(event).where(eq(event.id, eventId));
