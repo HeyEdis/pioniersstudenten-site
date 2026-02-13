@@ -15,22 +15,7 @@ const EVENTS_SELECT = {
   updated_at: true,
 };
 
-// export const createEvent = async(
-//     {
-//         label, title, date, start_time, end_time, description, image
-//     }: Promise<Event> => {
-//     try {
-//         const event = await db.insert(event: event).values({
-//             label: label
-
-//         },
-//     )
-//     }catch (error: any) {
-
-//     }
-// })
-
-export const createNew = async(
+export const create = async(
     label : PioneerLabel, title: string, date: string, start_time: string, end_time: string, description: string, image: string 
 ) :  Promise<Event[]> => {
     try {
