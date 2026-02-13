@@ -1,41 +1,19 @@
 import { db } from "@/core/db";
 import { event } from "@/drizzle/schema";
-import { Event } from "@/drizzle/zod";
+import { Event, PioneerLabel } from "@/drizzle/zod";
 import handleDBError from './_handleDbErrors';
-
-const EVENTS_SELECT = {
-  id: true,
-  label: true,
-  title: true,
-  date:true,
-  start_time: true,
-  end_time: true,
-  description: true,
-  image: true,
-  created_at: true,
-  updated_at: true,
-};
-
-// export const create = async(
-//     label : PioneerLabel, title: string, date: string, start_time: string, end_time: string, description: string, image: string 
-// ) :  Promise<Event[]> => {
-//     try {
-//         const e = await db.insert(event).values({
-//             label: label,
-//             title: title,
-//             date: date,
-//             start_time: start_time,
-//             end_time: end_time,
-//             description: description,
-//             image: image
-//         })
-//     return e;
-//     }catch(error){
-//         return handleDBError(error);
-//     }
-// }
+import { eq } from "drizzle-orm";
+import ServiceError from "@/core/serviceError";
 
 export const create = async(params: typeof event.$inferInsert) :  Promise<Event> => {
+    if(!params){throw ServiceError.notFound("De paramaters zijn leeg.")}
+    if(!params.label){throw new Error("Label is leeg.")}
+    if(!params.title){throw new Error("Titel is leeg.")}
+    if(!params.date){throw new Error("Datum is leeg.")}
+    if(!params.start_time){throw new Error("Starttijd is leeg.")}
+    if(!params.end_time){throw new Error("Eindtijd is leeg.")}
+    if(!params.description){throw new Error("Omschrijving is leeg.")}
+
     try{
         const [created] = await db
             .insert(event)
@@ -45,47 +23,57 @@ export const create = async(params: typeof event.$inferInsert) :  Promise<Event>
     }catch(error){
         throw handleDBError(error);
     }
-}
+};
 
-export const getAll = async() => {
+export const getAll = async() : Promise<Event[]> => {
     return await db.select().from(event);
-}
+};
 
-export const updateById = async(params: typeof event.$inferInsert) : Promise<Event> => {
+export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
+    if(!label){
+        throw ServiceError.notFound("Het label heeft geen waarde.")
+    }
 
-    try{
-        const select =  await db.select({ id: event.id}).from(event)
-        return select;
+    return await db.select()
+    .from(event)
+    .where(eq(event.label, label));
+};
+
+export const updateById = async(eventId : number, params: typeof event.$inferInsert) : Promise<Event> => {
+    if (!eventId){
+        throw ServiceError.notFound("Er is geen id van dit event.")
+    }
+
+    if(!params){
+        throw ServiceError.notFound("De paramaters zijn leeg.")
+    }
+    
+    try {
+        const [updatedEvent] =  await db.update(event)
+            .set({...params, 
+                updated_at : new Date(),}
+            )
+            .where(eq(event.id, eventId))
+            .returning();
+
+        if (!updatedEvent) {
+            throw ServiceError.notFound('Dit evenement bestaat niet.');
+        }
+        return updatedEvent;
     }catch(error){
         throw handleDBError(error);
     }
+};
 
-}
+export const deleteById = async(eventId: number) : Promise<void> => {
 
+    if (!eventId){
+        throw ServiceError.notFound("Er is geen id van dit event.")
+    }
 
-// export const updateById = async (id: number, gebruikerId : number, roles: string[], { naam, coverId, geboortedatum, beschrijving }: AuteurUpdateInput): Promise<Auteur> => {
-  
-//   if(!gebruikerId){
-//     throw ServiceError.forbidden('Je moet ingelogd zijn om een auteur aan te passen.');
-//   }
-  
-//   if(!roles.includes(Role.ADMIN)){
-//     throw ServiceError.forbidden('Je hebt geen rechten om deze auteur aan te passen.');
-//   }
-
-//   try{
-//     return await prisma.auteur.update({
-//       where: {
-//         id,
-//       },
-//       data: {
-//         naam,
-//         coverId,
-//         geboortedatum,
-//         beschrijving,
-//       },
-//     });
-//   }catch(error){
-//     throw handleDBError(error);
-//   }
-// };
+    try{
+        await db.delete(event).where(eq(event.id, eventId));
+    }catch(error){
+        throw handleDBError(error);
+    }
+};
