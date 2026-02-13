@@ -1,6 +1,7 @@
 import { db } from "@/core/db";
 import { event } from "@/drizzle/schema";
-import { Event, PioneerLabel } from "@/drizzle/zod";
+import { Event } from "@/drizzle/zod";
+import handleDBError from './_handleDbErrors';
 
 const EVENTS_SELECT = {
   id: true,
@@ -15,37 +16,48 @@ const EVENTS_SELECT = {
   updated_at: true,
 };
 
-export const create = async(
-    label : PioneerLabel, title: string, date: string, start_time: string, end_time: string, description: string, image: string 
-) :  Promise<Event[]> => {
-    try {
-        const e = await db.insert(event).values({
-            label: label,
-            title: title,
-            date: date,
-            start_time: start_time,
-            end_time: end_time,
-            description: description,
-            image: image
-        })
-    return e;
-    }catch(error: any){
-        return error;
-    }
+// export const create = async(
+//     label : PioneerLabel, title: string, date: string, start_time: string, end_time: string, description: string, image: string 
+// ) :  Promise<Event[]> => {
+//     try {
+//         const e = await db.insert(event).values({
+//             label: label,
+//             title: title,
+//             date: date,
+//             start_time: start_time,
+//             end_time: end_time,
+//             description: description,
+//             image: image
+//         })
+//     return e;
+//     }catch(error){
+//         return handleDBError(error);
+//     }
+// }
 
+export const create = async(params: typeof event.$inferInsert) :  Promise<Event> => {
+    try{
+        const [created] = await db
+            .insert(event)
+            .values(params)
+            .returning();
+    return created;
+    }catch(error){
+        throw handleDBError(error);
+    }
 }
 
 export const getAll = async() => {
     return await db.select().from(event);
 }
 
-export const updateById = async(event: Event) : Promise<Event> => {
+export const updateById = async(params: typeof event.$inferInsert) : Promise<Event> => {
 
     try{
         const select =  await db.select({ id: event.id}).from(event)
         return select;
-    }catch(error: any){
-        return error;
+    }catch(error){
+        throw handleDBError(error);
     }
 
 }
