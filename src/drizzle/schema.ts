@@ -18,7 +18,7 @@ export const members = pgTable("members", {
   lastname: varchar("lastname", {length: 50}).notNull(),
   gender: genderTypes("gender").notNull(),
   email: varchar("email", {length: 255}).notNull().unique(),
-  phonenumber: varchar("phonenumber", {length:14}).notNull(),
+  phonenumber: varchar("phonenumber", {length:14}).notNull().unique(),
   has_payed: boolean("has_payed"),
   is_student: boolean("is_student"),
   ...timestamps
@@ -79,7 +79,7 @@ export const registrations = pgTable("registrations", {
   firstname: varchar("firstname", {length: 50}).notNull(),
   lastname: varchar("lastname", {length: 50}).notNull(),
   email: varchar("email", {length: 255}).notNull().unique(),
-  phonenumber: varchar("phonenumber", {length:14}).notNull(),
+  phonenumber: varchar("phonenumber", {length:14}).notNull().unique(),
   label: pioneerLabel("label"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
@@ -95,7 +95,7 @@ export const registrationRelations = relations(registrations, ({one}) => ({
 export const event = pgTable("events", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   label: pioneerLabel("label"),
-  title: varchar("title", {length:200}).notNull(),
+  title: varchar("title", {length:200}).notNull().unique(),
   date: date("date").notNull(),
   start_time: time("start_time").notNull(),
   end_time: time("end_time").notNull(),
