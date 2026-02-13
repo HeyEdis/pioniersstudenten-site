@@ -4,7 +4,7 @@ import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
 export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
-export const userRole = pgEnum("userRole", ["Admin"]);
+export const userRole = pgEnum("userRole", ["Admin", "User"]);
 
 const timestamps = {
   created_at: timestamp("created_at").defaultNow().notNull(),
@@ -19,8 +19,8 @@ export const members = pgTable("members", {
   gender: genderTypes("gender").notNull(),
   email: varchar("email", {length: 255}).notNull().unique(),
   phonenumber: varchar("phonenumber", {length:14}).notNull().unique(),
-  has_payed: boolean("has_payed"),
-  is_student: boolean("is_student"),
+  has_payed: boolean("has_payed").notNull(),
+  is_student: boolean("is_student").notNull(),
   ...timestamps
 });
 
@@ -54,7 +54,7 @@ export const faq = pgTable("faq", {
 
 export const resource = pgTable("resources", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  type: resourceTypes("type"),
+  type: resourceTypes("type").notNull(),
   title: varchar("title", {length:200}).notNull(),
   url: text("url").notNull(),
   ...timestamps
@@ -94,7 +94,7 @@ export const registrationRelations = relations(registrations, ({one}) => ({
 
 export const event = pgTable("events", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  label: pioneerLabel("label"),
+  label: pioneerLabel("label").notNull(),
   title: varchar("title", {length:200}).notNull().unique(),
   date: date("date").notNull(),
   start_time: time("start_time").notNull(),
