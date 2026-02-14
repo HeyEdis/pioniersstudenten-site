@@ -1,4 +1,5 @@
 import config from 'config';
+import dayjs from 'dayjs';
 import winston from 'winston';
 const {
   combine, timestamp, colorize, printf,
@@ -38,12 +39,12 @@ const rootLogger: winston.Logger = winston.createLogger({
   defaultMeta: { env: APP_ENV },
   transports: APP_ENV === "testing" ? [
     new winston.transports.File({
-      filename: "logs/test.log",
+      filename: `logs/testing/${dayjs().format("YYYY-MM-DD")}.log`,
       silent: LOG_DISABLED,
     }),
   ] : APP_ENV === "development" ? [
     new winston.transports.File({
-      filename: "logs/dev.log",
+      filename: `logs/dev/${dayjs().format("YYYY-MM-DD")}.log`,
       silent: LOG_DISABLED,
     }),
     new winston.transports.Console({ silent: LOG_DISABLED }),
