@@ -1,25 +1,33 @@
 import * as eventService from "@/service/events";
 
 export async function GET( request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const event = await eventService.getById(parseInt(id));
+    const { id } = await params;
+    const event = await eventService.getById(parseInt(id));
 
-  if (!event){
-    return Response.json(
-        {error: "Evenement niet gevonden."},
-        {status: 404}
-    );
-  }
-  
-  return Response.json(event);
+    if (!event){
+        return Response.json(
+            {error: "Evenement niet gevonden."},
+            {status: 404}
+        );
+    }
+    
+    return Response.json(event);
 }
 
-export async function POST(request: Request) {
-  const incomingData = await request.json()
-  const user = incomingData.get("user");
-  const newEvent = eventService.create(user,incomingData);
-  
-  return Response.json({ newEvent })
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const body = await request.json();
+    const event = await eventService.updateById(parseInt(id), body);
+
+    return Response.json(event);
+
+}
+ 
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const event = await eventService.deleteById(parseInt(id));
+
+    return Response.json(event);
 }
 
 

@@ -1,6 +1,6 @@
 import { db } from "@/core/db";
-import { event, userRole } from "@/drizzle/schema";
-import { Admin, Event, PioneerLabel } from "@/drizzle/zod";
+import { event } from "@/drizzle/schema";
+import { Event, PioneerLabel } from "@/drizzle/zod";
 import handleDBError from './_handleDbErrors';
 import { eq } from "drizzle-orm";
 import ServiceError from "@/core/serviceError";
@@ -88,8 +88,8 @@ export const updateById = async(/*user: Admin ,*/eventId : number, params: Parti
     }
 };
 
-export const deleteById = async(user: Admin, eventId: number) : Promise<void> => {
-    if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
+export const deleteById = async(/*user: Admin,*/ eventId: number) : Promise<void> => {
+    // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
     
     if(!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
 

@@ -75,7 +75,7 @@ export const admin = pgTable("admins", {
 
 export const registrations = pgTable("registrations", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  event_id: integer("event_id").references(() => event.id).notNull(), // given the id an FK constraint
+  event_id: integer("event_id").references(() => event.id, {onDelete: "cascade"}).notNull(), // given the id an FK constraint
   firstname: varchar("firstname", {length: 50}).notNull(),
   lastname: varchar("lastname", {length: 50}).notNull(),
   email: varchar("email", {length: 255}).notNull().unique(),
