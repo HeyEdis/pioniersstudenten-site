@@ -42,8 +42,6 @@ export const getById = async(eventId: number) : Promise<Event> => {
     };
 
     return eventById;
-
-
 };
 
 export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
@@ -63,7 +61,6 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
 
 export const updateById = async(eventId : number, params: Partial<typeof event.$inferInsert>) : Promise<Event> => {
     if (!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
-
     if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
     if(!params.label){throw ServiceError.validationFailed("Label is leeg.")};
     if(!params.title){throw ServiceError.validationFailed("Titel is leeg.")};

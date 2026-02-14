@@ -150,7 +150,7 @@ async function main() {
      * To get the id's we need to use .returning()
      */
     const addressIds: number[] = [];
-    for (let i = 0; i < 14; i++){
+    for (let i = 0; i < 28; i++){
         const [address] =  await db.insert(schema.address).values({
             street: faker.location.street(),
             housenumber: faker.number.int({min: 1, max: 300}).toString(),
@@ -169,7 +169,7 @@ async function main() {
      */
     const allMembers: (typeof schema.members.$inferInsert)[] = [];
     for (const id of addressIds){
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 2; i++) {
             allMembers.push({
                 address_id: id,
                 firstname: faker.person.firstName(),
