@@ -1,4 +1,3 @@
-import { db } from "@/core/db";
 import { EventInsertSchema } from "@/drizzle/zod";
 import * as eventService from "@/service/events";
 import { NextResponse, NextRequest } from 'next/server';
@@ -10,8 +9,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await db;
-
     const formData = await request.formData();
     let event;
     let validData;
@@ -24,7 +21,6 @@ export async function POST(request: NextRequest) {
 
     }
     const createdEvent = await eventService.create(validData);
-
     return NextResponse.json({message: "Event is succesvol gecreëerd.", event: createdEvent}, {status: 201});
 
   } catch(e){

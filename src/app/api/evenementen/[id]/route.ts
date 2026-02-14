@@ -1,4 +1,5 @@
 import * as eventService from "@/service/events";
+import { EventUpdateSchema } from "@/drizzle/zod";
 
 export async function GET( request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -12,23 +13,26 @@ export async function GET( request: Request, { params }: { params: Promise<{ id:
     }
     
     return Response.json(event);
-}
+};
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const body = await request.json();
-    const event = await eventService.updateById(parseInt(id), body);
+
+    const validate = EventUpdateSchema.parse(body);
+    const event = await eventService.updateById(parseInt(id), validate);
+    console.log('id:' + JSON.stringify(id));
+    console.log("body: "+ JSON.stringify(body));
 
     return Response.json(event);
-
-}
+};
  
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const event = await eventService.deleteById(parseInt(id));
 
-    return Response.json(event);
-}
+    return Response.json({id: event});
+};
 
 
 // // Handler with parameters
