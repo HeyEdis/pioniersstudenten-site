@@ -38,7 +38,7 @@ export const getById = async(eventId: number) : Promise<Event> => {
         .where(eq(event.id,eventId));
 
     if(!eventById){
-        throw ServiceError.notFound(`Evenement met id ${eventId} is niet gevonden.`)
+        throw ServiceError.notFound(`Evenement met id "${eventId}" is niet gevonden.`)
     };
 
     return eventById;
@@ -60,7 +60,7 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
 };
 
 export const updateById = async(eventId : number, params: Partial<typeof event.$inferInsert>) : Promise<Event> => {
-    if (!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
+    if(!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
     if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
     if(!params.label){throw ServiceError.validationFailed("Label is leeg.")};
     if(!params.title){throw ServiceError.validationFailed("Titel is leeg.")};
@@ -77,6 +77,7 @@ export const updateById = async(eventId : number, params: Partial<typeof event.$
             )
             .where(eq(event.id, eventId))
             .returning();
+        
         return updatedEvent;
     }catch(error){
         throw handleDBError(error);
@@ -84,7 +85,7 @@ export const updateById = async(eventId : number, params: Partial<typeof event.$
 };
 
 export const deleteById = async(eventId: number) : Promise<void> => {
-    if (!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
+    if(!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
 
     try{
         await db.delete(event).where(eq(event.id, eventId));
