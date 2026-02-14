@@ -4,13 +4,14 @@ import * as schema from "./schema";
 import { genderTypes, resourceTypes, pioneerLabel, userRole } from "./schema";
 import { fakerNL_BE as faker } from "@faker-js/faker";
 import dayjs from "dayjs";
+import { getLogger } from "@/core/logging";
 
 const password = "wachtwoord123";
 
 async function main() {
     
     // Clear existing data
-    console.log("Cleaning up database.");
+    getLogger().info("Cleaning up database.");
     await db.delete(schema.notification);
     await db.delete(schema.registrations);
     await db.delete(schema.members);
@@ -39,7 +40,7 @@ async function main() {
         RESTART IDENTITY CASCADE
     `);
     
-    console.log("🌱 Seeding database...");
+    getLogger().info("🌱 Seeding database...");
     const admin: typeof schema.admin.$inferInsert = {
         email: "admin@example.com",
         password_hash: await Bun.password.hash(password),
@@ -47,7 +48,7 @@ async function main() {
     };
 
     await db.insert(schema.admin).values(admin);
-    console.log("Admin created!");
+    getLogger().info("Admin created!");
 
     const faq: (typeof schema.faq.$inferInsert)[] = [
         {
@@ -93,7 +94,7 @@ async function main() {
     ];
 
     await db.insert(schema.faq).values(faq);    
-    console.log("FAQ's created!");
+    getLogger().info("FAQ's created!");
 
     const resources: (typeof schema.resource.$inferInsert)[] = [
         {
@@ -139,7 +140,7 @@ async function main() {
     ];
 
     await db.insert(schema.resource).values(resources);    
-    console.log("Resources created!");
+    getLogger().info("Resources created!");
 
     /**
      * Address id's get stored so they can be used when generating members.
@@ -157,7 +158,7 @@ async function main() {
         addressIds.push(address.id);
     }
 
-    console.log("Addresses created!");
+    getLogger().info("Addresses created!");
 
     /**
      * Gets generated in an array and then in bulk it gets inserted into the DB
@@ -180,7 +181,7 @@ async function main() {
     }
 
     await db.insert(schema.members).values(allMembers);
-    console.log("Members created!");
+    getLogger().info("Members created!");
 
     const events: (typeof schema.event.$inferInsert)[] = [
         {
@@ -258,7 +259,7 @@ async function main() {
     ];
 
     await db.insert(schema.event).values(events);
-    console.log("Events created!");
+    getLogger().info("Events created!");
 
     const registrations: (typeof schema.registrations.$inferInsert)[] = [];
 
@@ -278,7 +279,7 @@ async function main() {
     }
 
     await db.insert(schema.registrations).values(registrations);
-    console.log("Users have been registered to events!");
+    getLogger().info("Users have been registered to events!");
 
     const notifications: (typeof schema.notification.$inferInsert)[] = [];
 
@@ -294,8 +295,8 @@ async function main() {
     }
 
     await db.insert(schema.notification).values(notifications);
-    console.log("Notifications created!");
-    console.log("✅ Seeding complete!");
+    getLogger().info("Notifications created!");
+    getLogger().info("✅ Seeding complete!");
 }
 
 
