@@ -5,8 +5,9 @@ import handleDBError from './_handleDbErrors';
 import { eq } from "drizzle-orm";
 import ServiceError from "@/core/serviceError";
 
-export const create = async(user: Admin ,params: typeof event.$inferInsert) :  Promise<Event> => {
-    if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
+export const create = async(/*user: Admin ,*/params: typeof event.$inferInsert) :  Promise<Event> => {
+    // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
+    
     if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
     if(!params.label){throw ServiceError.validationFailed("Label is leeg.")};
     if(!params.title){throw ServiceError.validationFailed("Titel is leeg.")};
@@ -60,8 +61,9 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
     return eventByLabel;
 };
 
-export const updateById = async(user: Admin,eventId : number, params: Partial<typeof event.$inferInsert>) : Promise<Event> => {
-    if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
+export const updateById = async(/*user: Admin ,*/eventId : number, params: Partial<typeof event.$inferInsert>) : Promise<Event> => {
+    // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
+    
     if(!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
     if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
     if(!params.label){throw ServiceError.validationFailed("Label is leeg.")};
@@ -88,6 +90,7 @@ export const updateById = async(user: Admin,eventId : number, params: Partial<ty
 
 export const deleteById = async(user: Admin, eventId: number) : Promise<void> => {
     if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
+    
     if(!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
 
     try{

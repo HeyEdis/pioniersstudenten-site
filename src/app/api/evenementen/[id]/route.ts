@@ -16,15 +16,11 @@ export async function GET( request: Request, { params }: { params: Promise<{ id:
 
 export async function POST(request: Request) {
   const incomingData = await request.json()
-  const newEvent = eventService.create(incomingData);
+  const user = incomingData.get("user");
+  const newEvent = eventService.create(user,incomingData);
   
   return Response.json({ newEvent })
 }
-
-const machineData = c.req.valid("json");
-    const user = c.get("user");
-    const machine = await machineService.createMachine(machineData, user);
-    return c.json({ code: machine.code });
 
 
 // // Handler with parameters
