@@ -141,6 +141,26 @@ TZ=Europe/Brussels
 DATABASE_URL=postgres://test:kiesEenWachtwoord@localhost:5434/pioniersstudenten-test
 ```
 
+## Logging
+
+Winston is used for logging on the server side, database logging will automatically use winston as the logger.
+
+To use the winston logger in the server, import and use getLogger like this:
+
+```javascript
+getLogger().info("your info log");
+getLogger().warning("your warning log");
+getLogger().error("your error log");
+```
+
+To log in the client side of the application just use the standard `console.log()`, winston does not support client side logging.
+
+## Configs
+
+There are config files for every environment and a default config in the `config` folder, these config can be used for storing environment specific variables for things like logging, auth, docs, cors, ...
+
+You van also add custom environment variables from your `.env` in the `custom-environment-variables.ts` file.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

@@ -38,9 +38,15 @@ const rootLogger: winston.Logger = winston.createLogger({
   defaultMeta: { env: APP_ENV },
   transports: APP_ENV === "testing" ? [
     new winston.transports.File({
-      filename: "test.log",
+      filename: "logs/test.log",
       silent: LOG_DISABLED,
     }),
+  ] : APP_ENV === "development" ? [
+    new winston.transports.File({
+      filename: "logs/dev.log",
+      silent: LOG_DISABLED,
+    }),
+    new winston.transports.Console({ silent: LOG_DISABLED }),
   ] : [
     new winston.transports.Console({ silent: LOG_DISABLED }),
   ],
