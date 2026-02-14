@@ -2,8 +2,8 @@
 
 ## Technologies & Packages Used
 
-- [Next.js](https://nextjs.org/) - Fullstack.
-- [React](https://react.dev/) - Utilises React as a Frontend.
+- [Next.js](https://nextjs.org/) - Fullstack framework.
+- [React](https://react.dev/) - NextJS utilises React as it's frontend.
 - [Docker](https://www.docker.com/products/docker-desktop/) - To run local containers of the database.
 - [Bun](https://bun.com/) - All in one toolkit: bundler, javascript runtime, testrunner and package manager.
 - [Betterauth](https://www.better-auth.com/) - Authentication.
@@ -17,8 +17,8 @@
 - [Shadcn](https://ui.shadcn.com/) - Make own component library.
 - [Winston](https://github.com/winstonjs/winston) - Logging.
 - [Tanstackquery](https://tanstack.com/query/latest) - Data fetching from API.
-- [Eslint](https://eslint.org/) - Linter.
-- [Swagger](https://swagger.io/) - Generating documentation.
+- [Eslint](https://eslint.org/) - To enforce code formatting rules.
+- [Swagger](https://swagger.io/) - Generating API documentation.
 - [Recharts](https://github.com/recharts/recharts) - Chart library.
 - [Slick-carousel](https://github.com/kenwheeler/slick) - Carousel.
 - [Day.js](https://github.com/iamkun/dayjs) - Immutable date-time library.
