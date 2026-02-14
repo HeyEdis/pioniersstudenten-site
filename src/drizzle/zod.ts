@@ -1,5 +1,5 @@
 import { createSelectSchema, createInsertSchema, createUpdateSchema } from 'drizzle-zod';
-import { address, members, faq, resource, admin, registrations, event, notification, genderTypes, resourceTypes, pioneerLabel } from "./schema";
+import { address, members, faq, resource, admin, registrations, event, notification, genderTypes, resourceTypes, pioneerLabel, userRole } from "./schema";
 import { z } from "zod";
 
 /**
@@ -38,9 +38,10 @@ export const RegistrationUpdateSchema = createUpdateSchema(registrations);
 export const EventUpdateSchema = createUpdateSchema(event);
 export const NotificationUpdateSchema = createUpdateSchema(notification);
 
-export const GenderEnumSchema = z.enum(genderTypes.enumValues)
-export const ResourceEnumSchema = z.enum(resourceTypes.enumValues)
-export const PioneerEnumSchema = z.enum(pioneerLabel.enumValues)
+export const GenderEnumSchema = z.enum(genderTypes.enumValues);
+export const ResourceEnumSchema = z.enum(resourceTypes.enumValues);
+export const PioneerEnumSchema = z.enum(pioneerLabel.enumValues);
+export const UserEnumSchema = z.enum(userRole.enumValues);
 
 export type Member = z.infer<typeof MemberSelectSchema>;
 export type Address = z.infer<typeof AddressSelectSchema>;
@@ -54,6 +55,7 @@ export type Notification = z.infer<typeof NotificationSelectSchema>;
 export type GenderEnum = z.infer<typeof GenderEnumSchema>;
 export type ResourceType = z.infer<typeof ResourceEnumSchema>;
 export type PioneerLabel = z.infer<typeof PioneerEnumSchema>;
+export type UserRole = z.infer<typeof UserEnumSchema>;
 
 
 
