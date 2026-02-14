@@ -157,9 +157,9 @@ To log in the client side of the application just use the standard `console.log(
 
 ## Configs
 
-There are config files for every environment and a default config in the `config` folder, these config can be used for storing environment specific variables for things like logging, auth, docs, cors, ...
+There are config files for every environment and a default config in the `config` folder, these configs can be used for storing environment specific variables for things like logging, auth, docs, cors, ...
 
-You van also add custom environment variables from your `.env` in the `custom-environment-variables.ts` file.
+You can also add custom environment variables from your `.env` in the `custom-environment-variables.ts` file.
 
 ## Learn More
 
