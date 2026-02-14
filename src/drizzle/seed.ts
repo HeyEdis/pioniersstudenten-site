@@ -12,7 +12,6 @@ async function main() {
     
     // Clear existing data
     getLogger().info("Cleaning up database.");
-    getLogger().info("test", "param", "param2", "param3")
     await db.delete(schema.notification);
     await db.delete(schema.registrations);
     await db.delete(schema.members);
