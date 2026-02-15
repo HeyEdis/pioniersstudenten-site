@@ -43,7 +43,7 @@ async function main() {
     getLogger().info("🌱 Seeding database...");
     const admin: typeof schema.admin.$inferInsert = {
         email: "admin@example.com",
-        password_hash: await Bun.password.hash(password),
+        name: "Peter Doens",
         role: userRole.enumValues[0]
     };
 
