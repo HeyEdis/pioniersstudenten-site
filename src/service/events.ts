@@ -8,14 +8,6 @@ import ServiceError from "@/core/serviceError";
 export const create = async(/*user: Admin ,*/params: typeof event.$inferInsert) :  Promise<Event> => {
     // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
     
-    if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
-    if(!params.label){throw ServiceError.badRequest("Label is leeg.")};
-    if(!params.title){throw ServiceError.badRequest("Titel is leeg.")};
-    if(!params.date){throw ServiceError.badRequest("Datum is leeg.")};
-    if(!params.start_time){throw ServiceError.badRequest("Starttijd is leeg.")};
-    if(!params.end_time){throw ServiceError.badRequest("Eindtijd is leeg.")};
-    if(!params.description){throw ServiceError.badRequest("Omschrijving is leeg.")};
-
     try{
         const [created] = await db
             .insert(event)
@@ -63,16 +55,8 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
 
 export const updateById = async(/*user: Admin ,*/eventId : number, params: Partial<typeof event.$inferInsert>) : Promise<Event> => {
     // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
-    
-    if(!eventId){throw ServiceError.notFound("Er is geen event met dit ID.")};
-    if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
-    if(!params.label){throw ServiceError.badRequest("Label is leeg.")};
-    if(!params.title){throw ServiceError.badRequest("Titel is leeg.")};
-    if(!params.date){throw ServiceError.badRequest("Datum is leeg.")};
-    if(!params.start_time){throw ServiceError.badRequest("Starttijd is leeg.")};
-    if(!params.end_time){throw ServiceError.badRequest("Eindtijd is leeg.")};
-    if(!params.description){throw ServiceError.badRequest("Omschrijving is leeg.")};
-    
+    if (!eventId) throw ServiceError.badRequest("Geen ID meegegeven.");
+
     try {
         const [updatedEvent] =  await db
             .update(event)
@@ -81,6 +65,10 @@ export const updateById = async(/*user: Admin ,*/eventId : number, params: Parti
             )
             .where(eq(event.id, eventId))
             .returning();
+        
+        if (!updatedEvent) {
+            throw ServiceError.notFound(`Evenement met ID ${eventId} niet gevonden.`);
+        }
         
         return updatedEvent;
     }catch(error){

@@ -70,39 +70,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 };
 
-// export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-//     try {
-//         const { id } = await params;
-//         const body = await request.json();
-//         const result = EventByIdQuerySchema.parse({id});
-//         const validatedEvent = EventUpdateSchema.parse(body);
-    
-//         const event = await eventService.updateById(result.id, validatedEvent);
-    
-//         return Response.json(event); 
-//     } catch (error) {
-//         // Checking if the error is a ServiceError to show the right errormessage
-//         if (error instanceof ServiceError) {
-//             return Response.json(
-//                 { message: error.message },
-//                 { status: error.status }
-//             );
-//         }
-//         // Checking if the error is a ZodError to show what the problem is
-//         if (error instanceof ZodError){
-//             return Response.json(
-//                 { message: error.issues.map(i => i.message) }, 
-//                 { status: 400 }
-//             );
-//         }
-//         // Everthing else gets handled like this.
-//         return Response.json(
-//             { message: "Er is een onverwachte fout opgetreden." },
-//             { status: 500 }
-//         );
-//     }
-// };
- 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     
     try {
