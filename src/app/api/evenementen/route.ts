@@ -4,11 +4,20 @@ import { NextResponse, NextRequest } from 'next/server';
 import ServiceError from "@/core/serviceError";
 import { ZodError } from "zod";
 
+/**
+ * Returning  all events
+ */
 export async function GET() {
     const events = await eventService.getAll();
     return Response.json(events);
 };
 
+/**
+ * 
+ * @param request Gets formdata from the frontend, Postman or HTTTPIE
+ * @returns A newly created event. That is typechecked with the zod schema (EventInsertSchema).
+ * If it failed creating an event a suitable error message gets displayed. 
+ */
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();

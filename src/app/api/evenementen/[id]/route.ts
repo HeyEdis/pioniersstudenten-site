@@ -5,7 +5,12 @@ import ServiceError from "@/core/serviceError";
 import { ZodError } from "zod";
 import { NextResponse } from "next/server";
 
-export async function GET( request: Request, { params }: { params: Promise<{ id: string }> }) {
+/**
+ * 
+ * @param params This is the ID of the current event. It's retrieved from the URL.
+ * @returns The details of a specific event if succesfull otherwise a suited error message.
+ */
+export async function GET( { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
         // Using validation scheme to coerce id to a number.
@@ -34,6 +39,12 @@ export async function GET( request: Request, { params }: { params: Promise<{ id:
     }
 };
 
+/**
+ * 
+ * @param request The admin filled out the event form in the frontend to change certain things about the event.
+ * @param param1 This is de ID of the event retrieved from the URL.
+ * @returns A changed event if succesfull otherwise a suited error message;
+ */
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
@@ -69,7 +80,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 };
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+/**
+ * 
+ * @param param This is de ID of the event retrieved from the URL.
+ * @returns An empty {} if succesfull otherwise a suited error message;
+ */
+export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
     
     try {
         const { id } = await params;
