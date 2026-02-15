@@ -31,7 +31,6 @@ export async function POST(request: NextRequest) {
               { status: 400 }
           );
       }
-      console.error("DEBUG DB ERROR:", error);
       return NextResponse.json(
          { message: "Er is een onverwachte fout opgetreden." },
         { status: 500 }
@@ -55,7 +54,6 @@ export async function POST(request: NextRequest) {
             { status: 400 }
         );
     }
-    console.error("DEBUG DB ERROR:", error);
     return Response.json(
         { message: "Er is een onverwachte fout opgetreden." },
         { status: 500 }

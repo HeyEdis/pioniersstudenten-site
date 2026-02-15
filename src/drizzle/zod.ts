@@ -82,8 +82,3 @@ export type GenderEnum = z.infer<typeof GenderEnumSchema>;
 export type ResourceType = z.infer<typeof ResourceEnumSchema>;
 export type PioneerLabel = z.infer<typeof PioneerEnumSchema>;
 export type UserRole = z.infer<typeof UserEnumSchema>;
-
-
-
-
-

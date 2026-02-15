@@ -49,21 +49,20 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     } catch (error) {
         // Checking if the error is a ServiceError to show the right errormessage
         if (error instanceof ServiceError) {
-            return Response.json(
+            return NextResponse.json(
                 { message: error.message },
                 { status: error.status }
             );
         }
         // Checking if the error is a ZodError to show what the problem is
         if (error instanceof ZodError){
-            return Response.json(
+            return NextResponse.json(
                 { message: error.issues.map(i => i.message) }, 
                 { status: 400 }
             );
         }
         // Everthing else gets handled like this.
-        console.error("PUT Error:", error);
-        return Response.json(
+        return NextResponse.json(
             { message: "Er is een onverwachte fout opgetreden." },
             { status: 500 }
         );
