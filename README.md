@@ -38,7 +38,7 @@ Make sure you have:
 
 ### Database GUI
 
-To check upon the seeded data in your local docker container it's usefull to install [pgAdmin](https://www.pgadmin.org/). It's a tool to look into your database and perform querries, generate ERD diagrams, etc.
+To check upon the seeded data in your local docker container it's usefull to install [pgAdmin](https://www.pgadmin.org/). It's a tool to look into your database and perform querries, generate ERD diagrams, etc. There is also [Dbbeaver](https://dbeaver.io/download/) this has a look and feel like mysql workbench, however you can use any database with it and have multiple different ones attached.
 
 Alternativly you can go into the docker GUI to the exec tab and execute `psql -U postgres -d pioniersstudenten` to connect to postgresSQL and then list all the tables with `\dt` and query the data with `SELECT * from events`.
 

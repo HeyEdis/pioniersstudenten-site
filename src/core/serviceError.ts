@@ -19,7 +19,7 @@ export default class ServiceError extends Error {
     return new ServiceError(NOT_FOUND, message);
   }
 
-  static validationFailed(message: string) {
+  static badRequest(message: string) {
     return new ServiceError(BAD_REQUEST, message);
   }
 
@@ -43,7 +43,7 @@ export default class ServiceError extends Error {
     return this.status === NOT_FOUND;
   }
 
-  get isValidationFailed(): boolean {
+  get isBadRequest(): boolean {
     return this.status === BAD_REQUEST;
   }
 

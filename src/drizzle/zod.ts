@@ -35,7 +35,15 @@ export const FaqUpdateSchema = createUpdateSchema(faq);
 export const ResourceUpdateSchema = createUpdateSchema(resource);
 export const AdminUpdateSchema = createUpdateSchema(admin);
 export const RegistrationUpdateSchema = createUpdateSchema(registrations);
-export const EventUpdateSchema = createUpdateSchema(event);
+export const EventUpdateSchema = createUpdateSchema(event, {
+    label: z.enum(["Toekomstige pioniersstudent", "Pioniersstudent"]),
+    title: z.string().nonempty("Titel mag niet leeg zijn"),
+    date: z.string().nonempty("Datum is verplicht"),
+    start_time: z.string().nonempty("Starttijd is verplicht"),
+    end_time: z.string().nonempty("Eindtijd is verplicht"),
+    description: z.string().nonempty("Omschrijving mag niet leeg zijn"),
+    image: z.string().nullable(),
+});
 export const NotificationUpdateSchema = createUpdateSchema(notification);
 
 export const GenderEnumSchema = z.enum(genderTypes.enumValues);

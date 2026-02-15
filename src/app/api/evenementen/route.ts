@@ -1,14 +1,13 @@
 import { EventInsertSchema } from "@/drizzle/zod";
 import * as eventService from "@/service/events";
 import { NextResponse, NextRequest } from 'next/server';
+import ServiceError from "@/core/serviceError";
+import { ZodError } from "zod";
 
 export async function GET() {
     const events = await eventService.getAll();
     return Response.json(events);
-}
-
-GET.validationScheme = null;
-
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,15 +18,47 @@ export async function POST(request: NextRequest) {
     try {
       event = Object.fromEntries(formData.entries());
       validData = EventInsertSchema.parse(event);
-    } catch(e){
-      return NextResponse.json({message: "Misvormd data formaat." + e}, {status: 400})
+    } catch(error){
+      if (error instanceof ServiceError) {
+          return NextResponse.json(
+              { message: error.message },
+              { status: error.status }
+          );
+      }
+      if (error instanceof ZodError){
+          return NextResponse.json(
+              { message: error.issues.map(i => i.message) }, 
+              { status: 400 }
+          );
+      }
+      console.error("DEBUG DB ERROR:", error);
+      return NextResponse.json(
+         { message: "Er is een onverwachte fout opgetreden." },
+        { status: 500 }
+      );
 
     }
     const createdEvent = await eventService.create(validData);
-    return NextResponse.json({message: "Event is succesvol gecreëerd.", event: createdEvent}, {status: 201});
+    return NextResponse.json(
+      { event: createdEvent })
 
-  } catch(e){
-    console.error(e);
-    return NextResponse.json({message: "Creëren van het event is mislukt", error: e instanceof Error ? e.message : "Unknown"}, {status: 500})
+  } catch(error){
+    if (error instanceof ServiceError) {
+        return Response.json(
+            { message: error.message },
+            { status: error.status }
+        );
+    }
+    if (error instanceof ZodError){
+        return Response.json(
+            { message: error.issues.map(i => i.message) }, 
+            { status: 400 }
+        );
+    }
+    console.error("DEBUG DB ERROR:", error);
+    return Response.json(
+        { message: "Er is een onverwachte fout opgetreden." },
+        { status: 500 }
+    );
   }
 };

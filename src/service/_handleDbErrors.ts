@@ -1,4 +1,4 @@
-import ServiceError from '../core/serviceError';
+import ServiceError from "@/core/serviceError";
 
 const handleDBError = (error : any) => {
   const { code = '', message } = error;
@@ -9,19 +9,19 @@ const handleDBError = (error : any) => {
   if (code === "23505") {
     switch (true) {
       case message.includes('email'):
-        throw ServiceError.validationFailed(
+        throw ServiceError.badRequest(
           'Dit e-mail adres is al in gebruik.',
         );
-      case message.includes('title'):
-        throw ServiceError.validationFailed(
+      case message.includes('events_title_unique'):
+        throw ServiceError.badRequest(
           'Een event bestaat al met deze titel.',
         );
       case message.includes('phonenumber'):
-        throw ServiceError.validationFailed(
+        throw ServiceError.badRequest(
           'Dit telefoonnummer is al geregistreerd.',
         );
       default:
-        throw ServiceError.validationFailed("Dit item bestaat al.");
+        throw ServiceError.badRequest("Dit item bestaat al.");
     }
   }
 

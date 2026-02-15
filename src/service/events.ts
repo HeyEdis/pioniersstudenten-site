@@ -9,12 +9,12 @@ export const create = async(/*user: Admin ,*/params: typeof event.$inferInsert) 
     // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
     
     if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
-    if(!params.label){throw ServiceError.validationFailed("Label is leeg.")};
-    if(!params.title){throw ServiceError.validationFailed("Titel is leeg.")};
-    if(!params.date){throw ServiceError.validationFailed("Datum is leeg.")};
-    if(!params.start_time){throw ServiceError.validationFailed("Starttijd is leeg.")};
-    if(!params.end_time){throw ServiceError.validationFailed("Eindtijd is leeg.")};
-    if(!params.description){throw ServiceError.validationFailed("Omschrijving is leeg.")};
+    if(!params.label){throw ServiceError.badRequest("Label is leeg.")};
+    if(!params.title){throw ServiceError.badRequest("Titel is leeg.")};
+    if(!params.date){throw ServiceError.badRequest("Datum is leeg.")};
+    if(!params.start_time){throw ServiceError.badRequest("Starttijd is leeg.")};
+    if(!params.end_time){throw ServiceError.badRequest("Eindtijd is leeg.")};
+    if(!params.description){throw ServiceError.badRequest("Omschrijving is leeg.")};
 
     try{
         const [created] = await db
@@ -32,7 +32,7 @@ export const getAll = async() : Promise<Event[]> => {
 };
 
 export const getById = async(eventId: number) : Promise<Event> => {
-    if(!eventId){throw ServiceError.validationFailed("Er is geen event met dit ID.")};
+    if(!eventId){throw ServiceError.badRequest("Er is geen event met dit ID.")};
 
     const [eventById] = await db
         .select()
@@ -66,12 +66,12 @@ export const updateById = async(/*user: Admin ,*/eventId : number, params: Parti
     
     if(!eventId){throw ServiceError.notFound("Er is geen event met dit ID.")};
     if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
-    if(!params.label){throw ServiceError.validationFailed("Label is leeg.")};
-    if(!params.title){throw ServiceError.validationFailed("Titel is leeg.")};
-    if(!params.date){throw ServiceError.validationFailed("Datum is leeg.")};
-    if(!params.start_time){throw ServiceError.validationFailed("Starttijd is leeg.")};
-    if(!params.end_time){throw ServiceError.validationFailed("Eindtijd is leeg.")};
-    if(!params.description){throw ServiceError.validationFailed("Omschrijving is leeg.")};
+    if(!params.label){throw ServiceError.badRequest("Label is leeg.")};
+    if(!params.title){throw ServiceError.badRequest("Titel is leeg.")};
+    if(!params.date){throw ServiceError.badRequest("Datum is leeg.")};
+    if(!params.start_time){throw ServiceError.badRequest("Starttijd is leeg.")};
+    if(!params.end_time){throw ServiceError.badRequest("Eindtijd is leeg.")};
+    if(!params.description){throw ServiceError.badRequest("Omschrijving is leeg.")};
     
     try {
         const [updatedEvent] =  await db
@@ -104,7 +104,6 @@ export const deleteById = async(/*user: Admin,*/ eventId: number) : Promise<void
     try{
         await db.delete(event).where(eq(event.id, eventId));
     } catch(error){
-        console.error("DEBUG DB ERROR:", error);
         throw handleDBError(error);
     }
 };

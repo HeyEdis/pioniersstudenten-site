@@ -20,17 +20,3 @@ export const EventByIdQuerySchema = z.object({
 //   })
 //   .strict()
 //   .openapi({ ref: "CommentCreateBodySchema" });
-
-// export const eventById = z
-//   .object({
-//     id: z.coerce.number(),
-//   })
-//   .openapi({ ref: "commentGetById" });
-
-// export const commentsReturnSchema = CommentsSchema.openapi({
-//   ref: "CommentsReturn",
-// });
-
-// export const commentsPerMaintenanceIdQuerySchema = z.object({
-//   maintenanceId: z.coerce.number(),
-// });

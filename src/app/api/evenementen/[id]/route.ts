@@ -3,6 +3,7 @@ import { EventUpdateSchema, EventSelectSchema } from "@/drizzle/zod";
 import { EventByIdQuerySchema } from "../../schemas/events";
 import ServiceError from "@/core/serviceError";
 import { ZodError } from "zod";
+import { NextResponse } from "next/server";
 
 export async function GET( request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -33,22 +34,18 @@ export async function GET( request: Request, { params }: { params: Promise<{ id:
     }
 };
 
-// GET.validationScheme = {
-//   params: {
-//     id: z.number().positive(),
-//   },
-// };
-
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        const body = await request.json();
+        const formData = await request.formData();
+
         const result = EventByIdQuerySchema.parse({id});
-        const validatedEvent = EventUpdateSchema.parse(body);
-    
-        const event = await eventService.updateById(result.id, validatedEvent);
-    
-        return Response.json(event); 
+        const eventData = Object.fromEntries(formData.entries());
+        const validatedEvent = EventUpdateSchema.parse(eventData);
+
+        const updatedEvent = await eventService.updateById(result.id, validatedEvent);
+        
+        return NextResponse.json(updatedEvent); 
     } catch (error) {
         // Checking if the error is a ServiceError to show the right errormessage
         if (error instanceof ServiceError) {
@@ -65,12 +62,46 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             );
         }
         // Everthing else gets handled like this.
+        console.error("PUT Error:", error);
         return Response.json(
             { message: "Er is een onverwachte fout opgetreden." },
             { status: 500 }
         );
     }
 };
+
+// export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+//     try {
+//         const { id } = await params;
+//         const body = await request.json();
+//         const result = EventByIdQuerySchema.parse({id});
+//         const validatedEvent = EventUpdateSchema.parse(body);
+    
+//         const event = await eventService.updateById(result.id, validatedEvent);
+    
+//         return Response.json(event); 
+//     } catch (error) {
+//         // Checking if the error is a ServiceError to show the right errormessage
+//         if (error instanceof ServiceError) {
+//             return Response.json(
+//                 { message: error.message },
+//                 { status: error.status }
+//             );
+//         }
+//         // Checking if the error is a ZodError to show what the problem is
+//         if (error instanceof ZodError){
+//             return Response.json(
+//                 { message: error.issues.map(i => i.message) }, 
+//                 { status: 400 }
+//             );
+//         }
+//         // Everthing else gets handled like this.
+//         return Response.json(
+//             { message: "Er is een onverwachte fout opgetreden." },
+//             { status: 500 }
+//         );
+//     }
+// };
  
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     
@@ -81,7 +112,6 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         const event = await eventService.deleteById(result.id);
     
         return Response.json({id: event});
-        
     } catch (error) {
         // Checking if the error is a ServiceError to show the right errormessage
         if (error instanceof ServiceError) {
@@ -104,35 +134,3 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         );
     }
 };
-
-
-// // Handler with parameters
-// async function getProduct(
-//   req: Request,
-//   { params }: { params: { id: string } }
-// ): Promise<Response> {
-//   const product = await productRepository.findById(params.id);
-  
-//   if (!product) {
-//     return Response.json(
-//       { error: "Product not found" },
-//       { status: 404 }
-//     );
-//   }
-  
-//   return Response.json(product);
-// }
-
-// // Handler with query parameters
-// async function searchProducts(req: Request): Promise<Response> {
-//   const url = new URL(req.url);
-//   const query = url.searchParams.get("q");
-//   const category = url.searchParams.get("category");
-  
-//   const products = await productRepository.search({
-//     query,
-//     category,
-//   });
-  
-//   return Response.json(products);
-// }
