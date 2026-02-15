@@ -32,7 +32,7 @@ export const getAll = async() : Promise<Event[]> => {
 };
 
 export const getById = async(eventId: number) : Promise<Event> => {
-    if(!eventId){throw ServiceError.validationFailed("Id van het event is niet meegegeven.")};
+    if(!eventId){throw ServiceError.validationFailed("Er is geen event met dit ID.")};
 
     const [eventById] = await db
         .select()
@@ -40,7 +40,7 @@ export const getById = async(eventId: number) : Promise<Event> => {
         .where(eq(event.id,eventId));
 
     if(!eventById){
-        throw ServiceError.notFound(`Evenement met id "${eventId}" is niet gevonden.`)
+        throw ServiceError.notFound(`Evenement met ID ${eventId} is niet gevonden.`)
     };
 
     return eventById;
@@ -55,7 +55,7 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
         .where(eq(event.label,label));
 
     if(eventByLabel.length === 0){
-        throw ServiceError.notFound(`Geen evenementen met het label "${label}" gevonden.`)
+        throw ServiceError.notFound(`Geen evenementen met het label ${label} gevonden.`)
     };
 
     return eventByLabel;
@@ -64,7 +64,7 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
 export const updateById = async(/*user: Admin ,*/eventId : number, params: Partial<typeof event.$inferInsert>) : Promise<Event> => {
     // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
     
-    if(!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
+    if(!eventId){throw ServiceError.notFound("Er is geen event met dit ID.")};
     if(!params){throw ServiceError.notFound("Alle velden zijn leeg.")};
     if(!params.label){throw ServiceError.validationFailed("Label is leeg.")};
     if(!params.title){throw ServiceError.validationFailed("Titel is leeg.")};
@@ -91,11 +91,20 @@ export const updateById = async(/*user: Admin ,*/eventId : number, params: Parti
 export const deleteById = async(/*user: Admin,*/ eventId: number) : Promise<void> => {
     // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
     
-    if(!eventId){throw ServiceError.notFound("Er is geen id van dit event.")};
+    if(!eventId){throw ServiceError.notFound("Er is geen event met dit ID.")};
+    
+    const [eventById] = await db
+        .select()
+        .from(event)
+        .where(eq(event.id,eventId));
 
+    if(!eventById){
+        throw ServiceError.notFound(`Evenement met ID ${eventId} is niet gevonden.`)
+    }
     try{
         await db.delete(event).where(eq(event.id, eventId));
-    }catch(error){
+    } catch(error){
+        console.error("DEBUG DB ERROR:", error);
         throw handleDBError(error);
     }
 };

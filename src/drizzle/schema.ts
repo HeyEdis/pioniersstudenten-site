@@ -112,7 +112,7 @@ export const eventRelations = relations(event, ({many}) => ({
 export const notification = pgTable("notifications", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   member_id: integer("member_id").references(() => members.id), // given the id an FK constraint,
-  registration_id: integer("registration_id").references(() => registrations.id), // given the id an FK constraint,
+  registration_id: integer("registration_id").references(() => registrations.id, {onDelete: "cascade"}), // given the id an FK constraint,
   title: varchar("title", {length:200}).notNull(),
   description: text("description").notNull(),
   is_new: boolean("is_new").default(true),

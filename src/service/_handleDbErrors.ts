@@ -1,6 +1,6 @@
 import ServiceError from '../core/serviceError';
 
-const handleDBError = (error: any) => {
+const handleDBError = (error : any) => {
   const { code = '', message } = error;
 
   /**

@@ -2,6 +2,7 @@ import * as eventService from "@/service/events";
 import { EventUpdateSchema, EventSelectSchema } from "@/drizzle/zod";
 import { EventByIdQuerySchema } from "../../schemas/events";
 import ServiceError from "@/core/serviceError";
+import { ZodError } from "zod";
 
 export async function GET( request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -15,34 +16,93 @@ export async function GET( request: Request, { params }: { params: Promise<{ id:
     } catch (error) {
         if (error instanceof ServiceError) {
             return Response.json(
-                {message: error.message},
-                {status: error.status}
+                { message: error.message },
+                { status: error.status }
+            );
+        }
+        if (error instanceof ZodError){
+            return Response.json(
+                { message: error.issues.map(i => i.message) }, 
+                { status: 400 }
             );
         }
         return Response.json(
-            { message: "Interne serverfout." }, 
+            { message: "Er is een onverwachte fout opgetreden." },
             { status: 500 }
         );
     }
 };
 
+// GET.validationScheme = {
+//   params: {
+//     id: z.number().positive(),
+//   },
+// };
+
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const body = await request.json();
-
-    const validate = EventUpdateSchema.parse(body);
-    const event = await eventService.updateById(parseInt(id), validate);
-    console.log('id:' + JSON.stringify(id));
-    console.log("body: "+ JSON.stringify(body));
-
-    return Response.json(event);
+    try {
+        const { id } = await params;
+        const body = await request.json();
+        const result = EventByIdQuerySchema.parse({id});
+        const validatedEvent = EventUpdateSchema.parse(body);
+    
+        const event = await eventService.updateById(result.id, validatedEvent);
+    
+        return Response.json(event); 
+    } catch (error) {
+        // Checking if the error is a ServiceError to show the right errormessage
+        if (error instanceof ServiceError) {
+            return Response.json(
+                { message: error.message },
+                { status: error.status }
+            );
+        }
+        // Checking if the error is a ZodError to show what the problem is
+        if (error instanceof ZodError){
+            return Response.json(
+                { message: error.issues.map(i => i.message) }, 
+                { status: 400 }
+            );
+        }
+        // Everthing else gets handled like this.
+        return Response.json(
+            { message: "Er is een onverwachte fout opgetreden." },
+            { status: 500 }
+        );
+    }
 };
  
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const event = await eventService.deleteById(parseInt(id));
-
-    return Response.json({id: event});
+    
+    try {
+        const { id } = await params;
+        const result = EventByIdQuerySchema.parse({id});
+    
+        const event = await eventService.deleteById(result.id);
+    
+        return Response.json({id: event});
+        
+    } catch (error) {
+        // Checking if the error is a ServiceError to show the right errormessage
+        if (error instanceof ServiceError) {
+            return Response.json(
+                { message: error.message },
+                { status: error.status }
+            );
+        }
+        // Checking if the error is a ZodError to show what the problem is
+        if (error instanceof ZodError){
+            return Response.json(
+                { message: error.issues.map(i => i.message) }, 
+                { status: 400 }
+            );
+        }
+        // Everthing else gets handled like this.
+        return Response.json(
+            { message: "Er is een onverwachte fout opgetreden." },
+            { status: 500 }
+        );
+    }
 };
 
 

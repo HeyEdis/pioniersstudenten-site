@@ -62,4 +62,4 @@ export default class ServiceError extends Error {
   get isConflict(): boolean {
     return this.status === CONFLICT;
   }
-}
+};
