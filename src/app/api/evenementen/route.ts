@@ -7,6 +7,9 @@ export async function GET() {
     return Response.json(events);
 }
 
+GET.validationScheme = null;
+
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();

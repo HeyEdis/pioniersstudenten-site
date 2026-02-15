@@ -1,4 +1,8 @@
-// import { z } from "zod";
+import { z } from "zod";
+
+export const EventByIdQuerySchema = z.object({
+  id: z.coerce.number(),
+});
 
 // export const commentCreateOrUpdateInput = z
 //   .object({

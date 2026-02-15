@@ -1,18 +1,29 @@
 import * as eventService from "@/service/events";
-import { EventUpdateSchema } from "@/drizzle/zod";
+import { EventUpdateSchema, EventSelectSchema } from "@/drizzle/zod";
+import { EventByIdQuerySchema } from "../../schemas/events";
+import ServiceError from "@/core/serviceError";
 
 export async function GET( request: Request, { params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const event = await eventService.getById(parseInt(id));
-
-    if (!event){
+    try {
+        const { id } = await params;
+        // Using validation scheme to coerce id to a number.
+        const result = EventByIdQuerySchema.parse({id});
+        const event = await eventService.getById(result.id);
+        const validatedEvent = EventSelectSchema.parse(event);
+    
+        return Response.json(validatedEvent);
+    } catch (error) {
+        if (error instanceof ServiceError) {
+            return Response.json(
+                {message: error.message},
+                {status: error.status}
+            );
+        }
         return Response.json(
-            {error: "Evenement niet gevonden."},
-            {status: 404}
+            { message: "Interne serverfout." }, 
+            { status: 500 }
         );
     }
-    
-    return Response.json(event);
 };
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {

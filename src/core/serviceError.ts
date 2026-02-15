@@ -1,17 +1,17 @@
-const NOT_FOUND = 'NOT_FOUND';
-const VALIDATION_FAILED = 'VALIDATION_FAILED';
-const UNAUTHORIZED = 'UNAUTHORIZED';
-const FORBIDDEN = 'FORBIDDEN';
-const INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR';
-const CONFLICT = 'CONFLICT';
+const NOT_FOUND = 404;
+const BAD_REQUEST = 400;
+const UNAUTHORIZED = 403;
+const FORBIDDEN = 401;
+const INTERNAL_SERVER_ERROR = 500;
+const CONFLICT = 409;
 
 export default class ServiceError extends Error {
   
-  code: string;
+  status: number;
   
-  constructor(code: string, message: string) {
+  constructor(status: number, message: string) {
     super(message);
-    this.code = code;
+    this.status = status;
     this.name = 'ServiceError';
   }
 
@@ -20,7 +20,7 @@ export default class ServiceError extends Error {
   }
 
   static validationFailed(message: string) {
-    return new ServiceError(VALIDATION_FAILED, message);
+    return new ServiceError(BAD_REQUEST, message);
   }
 
   static unauthorized(message: string) {
@@ -40,26 +40,26 @@ export default class ServiceError extends Error {
   }
 
   get isNotFound(): boolean {
-    return this.code === NOT_FOUND;
+    return this.status === NOT_FOUND;
   }
 
   get isValidationFailed(): boolean {
-    return this.code === VALIDATION_FAILED;
+    return this.status === BAD_REQUEST;
   }
 
   get isUnauthorized(): boolean {
-    return this.code === UNAUTHORIZED;
+    return this.status === UNAUTHORIZED;
   }
 
   get isForbidden(): boolean {
-    return this.code === FORBIDDEN;
+    return this.status === FORBIDDEN;
   }
 
   get isInternalServerError(): boolean {
-    return this.code === INTERNAL_SERVER_ERROR;
+    return this.status === INTERNAL_SERVER_ERROR;
   }
 
   get isConflict(): boolean {
-    return this.code === CONFLICT;
+    return this.status === CONFLICT;
   }
 }
