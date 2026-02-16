@@ -63,7 +63,7 @@ export const resource = pgTable("resources", {
 export const admin = pgTable("admins", {
   id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
   name: text("name").notNull(),
-  role: userRole(),
+  role: userRole().default(userRole.enumValues[0]),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -209,3 +209,25 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [admin.id],
   }),
 }));
+
+export const schema = {
+  members,
+  membersRelations,
+  address,
+  addressRelations,
+  faq,
+  resource,
+  admin,
+  registrations,
+  registrationRelations,
+  event,
+  eventRelations,
+  notification,
+  notificationRelations,
+  session,
+  account,
+  verification,
+  adminRelations,
+  sessionRelations,
+  accountRelations
+}
