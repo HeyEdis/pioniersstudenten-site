@@ -2,6 +2,9 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
 import { schema } from "@/drizzle/schema";
+import config from 'config';
+
+const SIGNUP_DISABLED = config.get<boolean>("betterauth.signupdisabled");
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -15,6 +18,7 @@ export const auth = betterAuth({
         enabled: true,
         minPasswordLength: 8,
         requireEmailVerification: false,
+        disableSignUp: SIGNUP_DISABLED,
     },
     advanced: {
         database: {
