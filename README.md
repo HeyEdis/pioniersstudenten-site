@@ -127,7 +127,7 @@ POSTGRES_PASSWORD=kiesEenWachtwoord
 
 DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
 
-BETTER_AUTH_SECRET="<your secret>"
+BETTER_AUTH_SECRET=FVFvp7yv7yYw8N3XuqN2ZUsTvGrOHwJh
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
