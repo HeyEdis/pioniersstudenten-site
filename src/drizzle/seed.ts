@@ -5,6 +5,7 @@ import { genderTypes, resourceTypes, pioneerLabel, userRole } from "./schema";
 import { fakerNL_BE as faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import { getLogger } from "@/core/logging";
+import { auth } from "@/core/auth";
 
 const password = "wachtwoord123";
 
@@ -41,13 +42,15 @@ async function main() {
     `);
     
     getLogger().info("🌱 Seeding database...");
-    const admin: typeof schema.admin.$inferInsert = {
-        email: "admin@example.com",
-        password_hash: await Bun.password.hash(password),
-        role: userRole.enumValues[0]
-    };
+    
+    await auth.api.signUpEmail({
+        body: {
+		    email: "admin@example.com",
+		    password: "password123",
+		    name: "Beheerder",
+	    },
+    })
 
-    await db.insert(schema.admin).values(admin);
     getLogger().info("Admin created!");
 
     const faq: (typeof schema.faq.$inferInsert)[] = [

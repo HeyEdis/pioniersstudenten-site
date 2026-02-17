@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar, index } from "drizzle-orm/pg-core";
 
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
@@ -61,11 +61,16 @@ export const resource = pgTable("resources", {
 });
 
 export const admin = pgTable("admins", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  email: varchar("email", {length: 255}).notNull().unique(),
-  role: userRole(),
-  password_hash: text("password_hash").notNull(),
-  ...timestamps
+  id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
+  name: text("name").notNull(),
+  role: userRole().default(userRole.enumValues[0]),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const registrations = pgTable("registrations", {
@@ -125,3 +130,98 @@ export const notificationRelations = relations(notification, ({one}) => ({
     references: [registrations.id],
   }),
 }));
+
+// Better-auth tables and relations
+export const session = pgTable(
+  "session",
+  {
+    id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
+    expiresAt: timestamp("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => admin.id, { onDelete: "cascade" }),
+  },
+  (table) => [index("session_userId_idx").on(table.userId)],
+);
+
+export const account = pgTable(
+  "account",
+  {
+    id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => admin.id, { onDelete: "cascade" }),
+    password: text("password"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index("account_userId_idx").on(table.userId)],
+);
+
+export const verification = pgTable(
+  "verification",
+  {
+    id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
+
+export const adminRelations = relations(admin, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  admin: one(admin, {
+    fields: [session.userId],
+    references: [admin.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  admin: one(admin, {
+    fields: [account.userId],
+    references: [admin.id],
+  }),
+}));
+
+export const schema = {
+  members,
+  membersRelations,
+  address,
+  addressRelations,
+  faq,
+  resource,
+  admin,
+  registrations,
+  registrationRelations,
+  event,
+  eventRelations,
+  notification,
+  notificationRelations,
+  session,
+  account,
+  verification,
+  adminRelations,
+  sessionRelations,
+  accountRelations
+}

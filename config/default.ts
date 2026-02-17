@@ -3,4 +3,7 @@ export default {
     level: "silly",
     disabled: false,
   },
+  betterauth: {
+    signupdisabled: false
+  }
 };

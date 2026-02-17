@@ -126,7 +126,12 @@ POSTGRES_USERNAME=postgres
 POSTGRES_PASSWORD=kiesEenWachtwoord
 
 DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
+
+BETTER_AUTH_SECRET="<your secret>"
+BETTER_AUTH_URL=http://localhost:3000
 ```
+
+Better-auth secret can be generated here: https://www.better-auth.com/docs/installation#set-environment-variables
 
 Example .env.test config:
 
