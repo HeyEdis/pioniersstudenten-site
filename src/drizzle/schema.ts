@@ -65,7 +65,7 @@ export const admin = pgTable("admins", {
   name: text("name").notNull(),
   role: userRole().default(userRole.enumValues[0]),
   email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
+  emailVerified: boolean("email_verified").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
