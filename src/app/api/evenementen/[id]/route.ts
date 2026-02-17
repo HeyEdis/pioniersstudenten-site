@@ -13,9 +13,11 @@ import { NextResponse } from "next/server";
 export async function GET( { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
+        console.log(id);
         // Using validation scheme to coerce id to a number.
         const result = EventByIdQuerySchema.parse({id});
         const event = await eventService.getById(result.id);
+        console.log(event);
         const validatedEvent = EventSelectSchema.parse(event);
     
         return Response.json(validatedEvent);

@@ -4,6 +4,7 @@ import { Event, PioneerLabel } from "@/drizzle/zod";
 import handleDBError from './_handleDbErrors';
 import { eq } from "drizzle-orm";
 import ServiceError from "@/core/serviceError";
+import { getLogger } from "@/core/logging";
 
 export const create = async(/*user: Admin ,*/params: typeof event.$inferInsert) :  Promise<Event> => {
     // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
@@ -13,8 +14,11 @@ export const create = async(/*user: Admin ,*/params: typeof event.$inferInsert) 
             .insert(event)
             .values(params)
             .returning();
+
+    getLogger().info(`200: Event ${created.id} is created.`)
     return created;
     }catch(error){
+        getLogger().error(error);
         throw handleDBError(error);
     }
 };
@@ -24,7 +28,10 @@ export const getAll = async() : Promise<Event[]> => {
 };
 
 export const getById = async(eventId: number) : Promise<Event> => {
-    if(!eventId){throw ServiceError.badRequest("Er is geen event met dit ID.")};
+    if(!eventId){
+        getLogger().warning(`Event with ID ${eventId} wasn't found.`);
+        throw ServiceError.badRequest("Er is geen event met dit ID.")
+    };
 
     const [eventById] = await db
         .select()
@@ -32,9 +39,10 @@ export const getById = async(eventId: number) : Promise<Event> => {
         .where(eq(event.id,eventId));
 
     if(!eventById){
+        getLogger().warning(`Event ${eventId} wasn't found.`);
         throw ServiceError.notFound(`Evenement met ID ${eventId} is niet gevonden.`)
     };
-
+    getLogger().info(`200: Event ${eventId} is retrieved.`)
     return eventById;
 };
 
@@ -47,6 +55,7 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
         .where(eq(event.label,label));
 
     if(eventByLabel.length === 0){
+        getLogger().warning(`Event with label ${label} weren't found.`);
         throw ServiceError.notFound(`Geen evenementen met het label ${label} gevonden.`)
     };
 
@@ -67,11 +76,14 @@ export const updateById = async(/*user: Admin ,*/eventId : number, params: Parti
             .returning();
         
         if (!updatedEvent) {
+            getLogger().warning(`Event with ID ${eventId} wasn't found.`);
             throw ServiceError.notFound(`Evenement met ID ${eventId} niet gevonden.`);
         }
         
+        getLogger().info(`200: Event ${eventId} is updated.`)
         return updatedEvent;
     }catch(error){
+        getLogger().error(error);
         throw handleDBError(error);
     }
 };
@@ -87,11 +99,14 @@ export const deleteById = async(/*user: Admin,*/ eventId: number) : Promise<void
         .where(eq(event.id,eventId));
 
     if(!eventById){
+        getLogger().warning(`Event with ID ${eventId} wasn't found.`);
         throw ServiceError.notFound(`Evenement met ID ${eventId} is niet gevonden.`)
     }
     try{
         await db.delete(event).where(eq(event.id, eventId));
+        getLogger().info(`200: Event ${eventId} is deleted.`)
     } catch(error){
+        getLogger().error(error);
         throw handleDBError(error);
     }
 };
