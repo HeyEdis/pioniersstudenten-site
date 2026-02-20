@@ -13,6 +13,13 @@ export const auth = betterAuth({
     }),
     user: {
         modelName: "admin",
+        additionalFields: {
+            role: {
+                type: "string",
+                required: false,
+                input: false,
+            },
+        },
     },
     emailAndPassword: { 
         enabled: true,
