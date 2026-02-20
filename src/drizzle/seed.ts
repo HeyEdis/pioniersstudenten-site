@@ -1,13 +1,11 @@
 import { db } from "../core/db";
 import { sql } from "drizzle-orm";
 import * as schema from "./schema";
-import { genderTypes, resourceTypes, pioneerLabel, userRole } from "./schema";
+import { genderTypes, resourceTypes, pioneerLabel } from "./schema";
 import { fakerNL_BE as faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import { getLogger } from "@/core/logging";
 import { auth } from "@/core/auth";
-
-const password = "wachtwoord123";
 
 async function main() {
     

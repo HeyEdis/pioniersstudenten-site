@@ -5,8 +5,12 @@ import handleDBError from './_handleDbErrors';
 import { eq } from "drizzle-orm";
 import ServiceError from "@/core/serviceError";
 import { getLogger } from "@/core/logging";
+// import { authClient } from "@/lib/auth-client";
 
 export const create = async(/*user: Admin ,*/params: typeof event.$inferInsert) :  Promise<Event> => {
+    // if ((await authClient.useSession().data?.user.)){
+
+    // }
     // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
     
     try{
