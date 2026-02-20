@@ -9,7 +9,7 @@ import { ZodError } from "zod";
  */
 export async function GET() {
     const events = await eventService.getAll();
-    return Response.json(events);
+    return NextResponse.json(events);
 };
 
 /**
@@ -52,18 +52,18 @@ export async function POST(request: NextRequest) {
 
   } catch(error){
     if (error instanceof ServiceError) {
-        return Response.json(
+        return NextResponse.json(
             { message: error.message },
             { status: error.status }
         );
     }
     if (error instanceof ZodError){
-        return Response.json(
+        return NextResponse.json(
             { message: error.issues.map(i => i.message) }, 
             { status: 400 }
         );
     }
-    return Response.json(
+    return NextResponse.json(
         { message: "Er is een onverwachte fout opgetreden." },
         { status: 500 }
     );

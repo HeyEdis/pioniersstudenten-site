@@ -10,31 +10,29 @@ import { NextResponse } from "next/server";
  * @param params This is the ID of the current event. It's retrieved from the URL.
  * @returns The details of a specific event if succesfull otherwise a suited error message.
  */
-export async function GET( { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        console.log(id);
         // Using validation scheme to coerce id to a number.
         const result = EventByIdQuerySchema.parse({id});
         const event = await eventService.getById(result.id);
-        console.log(event);
         const validatedEvent = EventSelectSchema.parse(event);
     
-        return Response.json(validatedEvent);
+        return NextResponse.json(validatedEvent);
     } catch (error) {
         if (error instanceof ServiceError) {
-            return Response.json(
+            return NextResponse.json(
                 { message: error.message },
                 { status: error.status }
             );
         }
         if (error instanceof ZodError){
-            return Response.json(
+            return NextResponse.json(
                 { message: error.issues.map(i => i.message) }, 
                 { status: 400 }
             );
         }
-        return Response.json(
+        return NextResponse.json(
             { message: "Er is een onverwachte fout opgetreden." },
             { status: 500 }
         );
@@ -87,7 +85,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
  * @param param This is de ID of the event retrieved from the URL.
  * @returns An empty {} if succesfull otherwise a suited error message;
  */
-export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     
     try {
         const { id } = await params;
@@ -95,24 +93,24 @@ export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
     
         const event = await eventService.deleteById(result.id);
     
-        return Response.json({id: event});
+        return NextResponse.json({id: event});
     } catch (error) {
         // Checking if the error is a ServiceError to show the right errormessage
         if (error instanceof ServiceError) {
-            return Response.json(
+            return NextResponse.json(
                 { message: error.message },
                 { status: error.status }
             );
         }
         // Checking if the error is a ZodError to show what the problem is
         if (error instanceof ZodError){
-            return Response.json(
+            return NextResponse.json(
                 { message: error.issues.map(i => i.message) }, 
                 { status: 400 }
             );
         }
         // Everthing else gets handled like this.
-        return Response.json(
+        return NextResponse.json(
             { message: "Er is een onverwachte fout opgetreden." },
             { status: 500 }
         );

@@ -14,7 +14,7 @@ services:
 
   postgres_test:
     image: postgres:18.1
-    restart: always
+    restart: no
     env_file:
       - .env.test
     volumes:

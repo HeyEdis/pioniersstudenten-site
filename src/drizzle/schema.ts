@@ -8,7 +8,7 @@ export const userRole = pgEnum("userRole", ["Admin", "User"]);
 
 const timestamps = {
   created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at"),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 };
 
 export const members = pgTable("members", {
@@ -37,7 +37,8 @@ export const address = pgTable("addresses", {
   street: varchar("street", {length: 255}).notNull(),
   housenumber: varchar("housenumber", {length: 10}).notNull(),
   city: varchar("city", {length: 80}).notNull(),
-  province: varchar("province", {length: 80}).notNull()
+  province: varchar("province", {length: 80}).notNull(),
+  ...timestamps
 });
 
 // One address can have many members

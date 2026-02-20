@@ -26,7 +26,7 @@ export const EventSelectSchema = createSelectSchema(event,{
     description: z.string().nonempty("Omschrijving mag niet leeg zijn."),
     image: z.string().nullable(),
     created_at: z.date(),
-    updated_at: z.date().nullable(),
+    updated_at: z.date(),
 });
 export const NotificationSelectSchema = createSelectSchema(notification);
 

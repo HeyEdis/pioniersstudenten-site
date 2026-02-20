@@ -19,22 +19,8 @@
     {
       "idx": 2,
       "version": "7",
-      "when": 1771008693859,
-      "tag": "0002_superb_captain_midlands",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1771096672324,
-      "tag": "0003_clever_kronos",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1771167764226,
-      "tag": "0004_tricky_maginty",
+      "when": 1771596906396,
+      "tag": "0002_careful_starfox",
       "breakpoints": true
     }
   ]
