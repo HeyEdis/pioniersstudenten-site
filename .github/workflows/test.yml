@@ -12,6 +12,13 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      POSTGRES_DB: {{ POSTGRES_DB }}
+      POSTGRES_USER: {{ POSTGRES_USERNAME}}
+      POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD }}
+      TZ: Europe/Brussels
+      DATABASE_URL: {{ DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
