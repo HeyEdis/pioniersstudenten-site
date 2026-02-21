@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 
 export const createUserSession = async (userId: number) => {
     const sessionData = {
-        id: Math.random() * (100 - 1) + 1, // Generate random number between 100 & 1
         expiresAt: dayjs().add(1, "day").toDate(),
         token: crypto.randomUUID().toString(),
         createdAt: new Date(),

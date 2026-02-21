@@ -1,35 +1,32 @@
-import { UserRole } from "@/drizzle/zod";
-
-import { createApp } from "@/core/server";
+import { UserRole, Admin } from "@/drizzle/zod";
 import { db } from "@/core/db";
-import { session } from "@/drizzle/schema";
+import { session, admin } from "@/drizzle/schema";
+import { eq, and } from "drizzle-orm";
 
-export const createClient = async (role: UserRole) => {
-  const app = createApp();
+export const createClient = async (role: UserRole, user: Admin) => {
 
-  const appRequestHandler = app.request;
-  app.request = async (path: string, init?: RequestInit) => {
+  const [sessionByRole] = await db
+    .select()
+    .from(session)
+    .innerJoin(admin, eq(session.userId, user.id))
+    .where(
+      and(
+        eq(admin.role, role),
+        eq(admin.id, user.id)
+      )
+    )
+    .limit(1)
 
-    const [sessionByRole] = await db
-        .select()
-        .from(session)
-        .
+    // 2. Return a custom fetcher
+  return async (path: string, init?: RequestInit) => {
+    const baseUrl = process.env.BETTER_AUTH_URL;
     
-    // const session = await db.session.findFirstOrThrow({
-    //   where: {
-    //     user: {
-    //       role,
-    //     },
-    //   },
-    // });
-    return appRequestHandler(path, {
+    return fetch(`${baseUrl}${path}`, {
       ...init,
       headers: {
         ...init?.headers,
-        Cookie: `pioniersstudenten_session_id=${session.id}`,
+        Cookie: `pioniersstudenten_session_id=${sessionByRole.session.id}`,
       },
     });
   };
-
-  return app;
 };
