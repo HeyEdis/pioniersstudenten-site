@@ -3,8 +3,9 @@ import { cleanupAllSessions, createUserSession } from "../helpers/auth";
 import { createClient } from "../helpers/setup";
 import { userRole } from "@/drizzle/schema";
 
+const base_url = process.env.BETTER_AUTH_URL;
 
-describe("Comment routes", () => {
+describe("Event routes", () => {
   beforeEach(async () => {
     const userId: number = 1;
     await cleanupAllSessions();
@@ -20,7 +21,7 @@ describe("Comment routes", () => {
 
   describe("Get all", () => {
     it("Should return all", async () => {
-      const response = await fetch("/api/evenementen");
+      const response = await fetch(`${base_url}/api/evenementen`);
       expect(response.ok).toBe(true);
       // const machines = await resp.json() as Machine[];
       // expect(machines.length).toBe(30);

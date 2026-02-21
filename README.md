@@ -127,7 +127,7 @@ POSTGRES_PASSWORD=kiesEenWachtwoord
 
 DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
 
-BETTER_AUTH_SECRET=FVFvp7yv7yYw8N3XuqN2ZUsTvGrOHwJh
+BETTER_AUTH_SECRET=<insert here the generated variable>
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
@@ -136,7 +136,8 @@ Better-auth secret can be generated here: https://www.better-auth.com/docs/insta
 Example .env.test config:
 
 ```bash
-APP_ENV=testing
+APP_ENV=test
+LOG_LEVEL=error
 
 POSTGRES_DB=pioniersstudenten-test
 POSTGRES_USER=test
@@ -144,6 +145,9 @@ POSTGRES_PASSWORD=kiesEenWachtwoord
 TZ=Europe/Brussels
 
 DATABASE_URL=postgres://test:kiesEenWachtwoord@localhost:5434/pioniersstudenten-test
+
+BETTER_AUTH_SECRET=<insert here the generated variable>
+BETTER_AUTH_URL=http://localhost:3000
 ```
 
 ## Logging

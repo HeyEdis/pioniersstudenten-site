@@ -11,7 +11,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "bun run ./src/drizzle/seed.ts",
-    "test:setup": "env-cmd -f .env.test drizzle-kit migrate",
+    "test:setup": "env-cmd -f .env.test drizzle-kit migrate && bun test:seed",
     "test:seed": "env-cmd -f .env.test bun run ./src/drizzle/seed.ts"
   },
   "dependencies": {
