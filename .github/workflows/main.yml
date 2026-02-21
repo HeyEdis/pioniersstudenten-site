@@ -18,8 +18,16 @@ jobs:
 
       # 2. Build the Docker image
       - name: Build Docker Image
-        # Updated image name to pioniersstudenten-site
-        run: docker build -t pioniersstudenten-site .
+        run: |
+          docker build \
+            --build-arg APP_ENV=development \
+            --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+            --build-arg POSTGRES_USER=${{ secrets.POSTGRES_USERNAME }} \
+            --build-arg POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            --build-arg BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
+            --build-arg BETTER_AUTH_URL=http://localhost:3000 \
+            -t pioniersstudenten-site .
 
       # 3. Save the image to a tar file (for transfer)
       - name: Save Docker Image
@@ -66,8 +74,7 @@ jobs:
               --name pioniersstudenten-site \
               -p 3000:3000 \
               --restart unless-stopped \
-              pioniersstudenten-site \
-              --env-file /tmp/db.env \
+              pioniersstudenten-site 
             
             # Cleanup the tar file to save space
             rm pioniersstudenten-site.tar
