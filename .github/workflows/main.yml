@@ -74,7 +74,14 @@ jobs:
               --name pioniersstudenten-site \
               -p 3000:3000 \
               --restart unless-stopped \
-              pioniersstudenten-site 
+              -e APP_ENV=development \
+              -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+              -e POSTGRES_USER=${{ secrets.POSTGRES_USERNAME }} \
+              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
+              -e BETTER_AUTH_URL=http://localhost:3000 \
+              pioniersstudenten-site
             
             # Cleanup the tar file to save space
             rm pioniersstudenten-site.tar
