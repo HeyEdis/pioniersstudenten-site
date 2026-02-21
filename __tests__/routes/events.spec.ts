@@ -23,8 +23,6 @@ describe("Event routes", () => {
     it("Should return all", async () => {
       const response = await fetch(`${base_url}/api/evenementen`);
       expect(response.ok).toBe(true);
-      // const machines = await resp.json() as Machine[];
-      // expect(machines.length).toBe(30);
     });
   });
 

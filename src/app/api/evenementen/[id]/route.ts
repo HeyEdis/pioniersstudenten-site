@@ -48,13 +48,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
+        const { headers } = request;
         const formData = await request.formData();
 
         const result = EventByIdQuerySchema.parse({id});
         const eventData = Object.fromEntries(formData.entries());
         const validatedEvent = EventUpdateSchema.parse(eventData);
 
-        const updatedEvent = await eventService.updateById(result.id, validatedEvent);
+        const updatedEvent = await eventService.updateById(result.id, validatedEvent/*, headers*/);
         
         return NextResponse.json(updatedEvent); 
     } catch (error) {
@@ -74,7 +75,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         }
         // Everthing else gets handled like this.
         return NextResponse.json(
-            { message: "Er is een onverwachte fout opgetreden." },
+            { message: error },
             { status: 500 }
         );
     }
@@ -89,9 +90,10 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     
     try {
         const { id } = await params;
+        const { headers } = request;
         const result = EventByIdQuerySchema.parse({id});
     
-        const event = await eventService.deleteById(result.id);
+        const event = await eventService.deleteById(result.id, headers);
     
         return NextResponse.json({id: event});
     } catch (error) {

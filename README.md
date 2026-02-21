@@ -127,7 +127,7 @@ POSTGRES_PASSWORD=kiesEenWachtwoord
 
 DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
 
-BETTER_AUTH_SECRET=<insert generated variable here>
+BETTER_AUTH_SECRET=<insert generated secret here>
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
@@ -146,7 +146,7 @@ TZ=Europe/Brussels
 
 DATABASE_URL=postgres://test:kiesEenWachtwoord@localhost:5434/pioniersstudenten-test
 
-BETTER_AUTH_SECRET=<insert generated variable here>
+BETTER_AUTH_SECRET=<insert generated secret here>
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
@@ -180,7 +180,7 @@ To run the tests you will need to setup your test db. This command applies the m
 bun test:setup
 ```
 
-Afterwards, open a new terminal and run `bun dev`. The test need an online instance and run `bun test` to execute all the tests.
+Afterwards, open a new terminal and run `bun dev` because the test runner needs an online instance and run `bun test` to execute them all.
 
 ## Learn More
 

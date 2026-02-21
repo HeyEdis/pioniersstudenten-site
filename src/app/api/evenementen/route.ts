@@ -21,6 +21,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
+    // const { headers } = request;
     let event;
     let validData;
 
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
         );
     }
     return NextResponse.json(
-        { message: "Er is een onverwachte fout opgetreden." },
+        { message: error.message },
         { status: 500 }
     );
   }

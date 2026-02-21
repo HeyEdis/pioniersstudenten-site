@@ -1,18 +1,30 @@
 import { db } from "@/core/db";
-import { event } from "@/drizzle/schema";
+import { event, userRole } from "@/drizzle/schema";
 import { Event, PioneerLabel } from "@/drizzle/zod";
 import handleDBError from './_handleDbErrors';
 import { eq } from "drizzle-orm";
 import ServiceError from "@/core/serviceError";
 import { getLogger } from "@/core/logging";
-// import { authClient } from "@/lib/auth-client";
+import { auth } from "@/core/auth";
 
-export const create = async(/*user: Admin ,*/params: typeof event.$inferInsert) :  Promise<Event> => {
-    // if ((await authClient.useSession().data?.user.)){
+export const create = async(params: (typeof event.$inferInsert)) :  Promise<Event> => {
+    // const session = await auth.api.getSession({
+    //     headers: headers
+    // });
 
-    // }
-    // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
-    
+    // const auditInfo = {
+    //     userId: session?.user.id ?? "anonymous",
+    //     userEmail: session?.user.email ?? "unknown",
+    //     ip: headers.get("x-forwarded-for") || "unknown",
+    //     userAgent: headers.get("user-agent"),
+    //     referer: headers.get("referer"),
+    // };
+
+    // if (session?.user.role !== userRole.enumValues[0]){
+    //     getLogger().warn(`Unauthorized event CREATE attempt: ${JSON.stringify(auditInfo)}`);
+    //     throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+    // };
+
     try{
         const [created] = await db
             .insert(event)
@@ -33,7 +45,7 @@ export const getAll = async() : Promise<Event[]> => {
 
 export const getById = async(eventId: number) : Promise<Event> => {
     if(!eventId){
-        getLogger().warning(`Event with ID ${eventId} wasn't found.`);
+        getLogger().warn(`Event with ID ${eventId} wasn't found.`);
         throw ServiceError.badRequest("Er is geen event met dit ID.")
     };
 
@@ -43,7 +55,7 @@ export const getById = async(eventId: number) : Promise<Event> => {
         .where(eq(event.id,eventId));
 
     if(!eventById){
-        getLogger().warning(`Event ${eventId} wasn't found.`);
+        getLogger().warn(`Event ${eventId} wasn't found.`);
         throw ServiceError.notFound(`Evenement met ID ${eventId} is niet gevonden.`)
     };
     getLogger().info(`200: Event ${eventId} is retrieved.`)
@@ -59,17 +71,33 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
         .where(eq(event.label,label));
 
     if(eventByLabel.length === 0){
-        getLogger().warning(`Event with label ${label} weren't found.`);
+        getLogger().warn(`Event with label ${label} weren't found.`);
         throw ServiceError.notFound(`Geen evenementen met het label ${label} gevonden.`)
     };
 
     return eventByLabel;
 };
 
-export const updateById = async(/*user: Admin ,*/eventId : number, params: Partial<typeof event.$inferInsert>) : Promise<Event> => {
-    // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
-    if (!eventId) throw ServiceError.badRequest("Geen ID meegegeven.");
+export const updateById = async(eventId : number, params: Partial<Event>/*, headers: Headers */) : Promise<Event> => {
+    // const session = await auth.api.getSession({
+    //     headers: headers
+    // });
 
+    // const auditInfo = {
+    //     userId: session?.user.id ?? "anonymous",
+    //     userEmail: session?.user.email ?? "unknown",
+    //     ip: headers.get("x-forwarded-for") || "unknown",
+    //     userAgent: headers.get("user-agent"),
+    //     referer: headers.get("referer"),
+    // };
+
+    // if (session?.user.role !== userRole.enumValues[0]){
+    //     getLogger().warn(`Unauthorized event UPDATE attempt: ${JSON.stringify(auditInfo)}`);
+    //     throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+    // };
+    
+    if (!eventId) throw ServiceError.badRequest("Geen ID meegegeven.");
+    
     try {
         const [updatedEvent] =  await db
             .update(event)
@@ -80,7 +108,7 @@ export const updateById = async(/*user: Admin ,*/eventId : number, params: Parti
             .returning();
         
         if (!updatedEvent) {
-            getLogger().warning(`Event with ID ${eventId} wasn't found.`);
+            getLogger().warn(`Event with ID ${eventId} wasn't found.`);
             throw ServiceError.notFound(`Evenement met ID ${eventId} niet gevonden.`);
         }
         
@@ -92,8 +120,23 @@ export const updateById = async(/*user: Admin ,*/eventId : number, params: Parti
     }
 };
 
-export const deleteById = async(/*user: Admin,*/ eventId: number) : Promise<void> => {
-    // if(user.role !== userRole.enumValues[0]){throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")};
+export const deleteById = async(eventId: number, headers : Headers) : Promise<void> => {
+    const session = await auth.api.getSession({
+        headers: headers
+    });
+
+    const auditInfo = {
+        userId: session?.user.id ?? "anonymous",
+        userEmail: session?.user.email ?? "unknown",
+        ip: headers.get("x-forwarded-for") || "unknown",
+        userAgent: headers.get("user-agent"),
+        referer: headers.get("referer"),
+    };
+
+    if (session?.user.role !== userRole.enumValues[0]){
+        getLogger().warn(`Unauthorized event DELETE attempt: ${JSON.stringify(auditInfo)}`);
+        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+    };
     
     if(!eventId){throw ServiceError.notFound("Er is geen event met dit ID.")};
     
@@ -103,7 +146,7 @@ export const deleteById = async(/*user: Admin,*/ eventId: number) : Promise<void
         .where(eq(event.id,eventId));
 
     if(!eventById){
-        getLogger().warning(`Event with ID ${eventId} wasn't found.`);
+        getLogger().warn(`Event with ID ${eventId} wasn't found.`);
         throw ServiceError.notFound(`Evenement met ID ${eventId} is niet gevonden.`)
     }
     try{
