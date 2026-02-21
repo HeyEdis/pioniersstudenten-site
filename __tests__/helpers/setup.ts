@@ -1,18 +1,18 @@
-import { UserRole, Admin } from "@/drizzle/zod";
+import { UserRole } from "@/drizzle/zod";
 import { db } from "@/core/db";
 import { session, admin } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
-export const createClient = async (role: UserRole, user: Admin) => {
+export const createClient = async (role: UserRole, userId: number) => {
 
   const [sessionByRole] = await db
     .select()
     .from(session)
-    .innerJoin(admin, eq(session.userId, user.id))
+    .innerJoin(admin, eq(session.userId, userId))
     .where(
       and(
         eq(admin.role, role),
-        eq(admin.id, user.id)
+        eq(admin.id, userId)
       )
     )
     .limit(1)
