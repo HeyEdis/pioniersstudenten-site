@@ -127,7 +127,7 @@ POSTGRES_PASSWORD=kiesEenWachtwoord
 
 DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
 
-BETTER_AUTH_SECRET=<insert here the generated variable>
+BETTER_AUTH_SECRET=<insert generated variable here>
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
@@ -146,9 +146,11 @@ TZ=Europe/Brussels
 
 DATABASE_URL=postgres://test:kiesEenWachtwoord@localhost:5434/pioniersstudenten-test
 
-BETTER_AUTH_SECRET=<insert here the generated variable>
+BETTER_AUTH_SECRET=<insert generated variable here>
 BETTER_AUTH_URL=http://localhost:3000
 ```
+
+Better-auth secret can be generated here: https://www.better-auth.com/docs/installation#set-environment-variables
 
 ## Logging
 
@@ -169,6 +171,16 @@ To log in the client side of the application just use the standard `console.log(
 There are config files for every environment and a default config in the `config` folder, these configs can be used for storing environment specific variables for things like logging, auth, docs, cors, ...
 
 You can also add custom environment variables from your `.env` in the `custom-environment-variables.ts` file.
+
+## Testing
+
+To run the tests you will need to setup your test db. This command applies the migrations and seeds the db. Also bun expects the `APP_ENV` variable to be named 'test' so make sure thats done.
+
+```bash
+bun test:setup
+```
+
+Afterwards, open a new terminal and run `bun dev`. The test need an online instance and run `bun test` to execute all the tests.
 
 ## Learn More
 
