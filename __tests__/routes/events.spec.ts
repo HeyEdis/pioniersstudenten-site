@@ -18,6 +18,17 @@ describe("Comment routes", () => {
   });
 
 
+  describe("Get all", () => {
+    it("Should return all", async () => {
+      const response = await fetch("/api/evenementen");
+      expect(response.ok).toBe(true);
+      // const machines = await resp.json() as Machine[];
+      // expect(machines.length).toBe(30);
+    });
+  });
+
+
+
   
 
 });
