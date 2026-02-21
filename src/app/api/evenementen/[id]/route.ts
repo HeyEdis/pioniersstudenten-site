@@ -55,7 +55,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         const eventData = Object.fromEntries(formData.entries());
         const validatedEvent = EventUpdateSchema.parse(eventData);
 
-        const updatedEvent = await eventService.updateById(result.id, validatedEvent/*, headers*/);
+        const updatedEvent = await eventService.updateById(result.id, validatedEvent, headers);
         
         return NextResponse.json(updatedEvent); 
     } catch (error) {
@@ -75,7 +75,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         }
         // Everthing else gets handled like this.
         return NextResponse.json(
-            { message: error },
+            { message: "Er is een onverwachte fout opgetreden." },
             { status: 500 }
         );
     }

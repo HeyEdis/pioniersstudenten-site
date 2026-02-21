@@ -7,23 +7,23 @@ import ServiceError from "@/core/serviceError";
 import { getLogger } from "@/core/logging";
 import { auth } from "@/core/auth";
 
-export const create = async(params: (typeof event.$inferInsert)) :  Promise<Event> => {
-    // const session = await auth.api.getSession({
-    //     headers: headers
-    // });
+export const create = async(params: typeof event.$inferInsert, headers: Headers) :  Promise<Event> => {
+    const session = await auth.api.getSession({
+        headers: headers
+    });
 
-    // const auditInfo = {
-    //     userId: session?.user.id ?? "anonymous",
-    //     userEmail: session?.user.email ?? "unknown",
-    //     ip: headers.get("x-forwarded-for") || "unknown",
-    //     userAgent: headers.get("user-agent"),
-    //     referer: headers.get("referer"),
-    // };
+    const auditInfo = {
+        userId: session?.user.id ?? "anonymous",
+        userEmail: session?.user.email ?? "unknown",
+        ip: headers.get("x-forwarded-for") || "unknown",
+        userAgent: headers.get("user-agent"),
+        referer: headers.get("referer"),
+    };
 
-    // if (session?.user.role !== userRole.enumValues[0]){
-    //     getLogger().warn(`Unauthorized event CREATE attempt: ${JSON.stringify(auditInfo)}`);
-    //     throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
-    // };
+    if (session?.user.role !== userRole.enumValues[0]){
+        getLogger().warn(`Unauthorized event CREATE attempt: ${JSON.stringify(auditInfo)}`);
+        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+    };
 
     try{
         const [created] = await db
@@ -78,23 +78,23 @@ export const getByLabel = async(label: PioneerLabel) : Promise<Event[]> => {
     return eventByLabel;
 };
 
-export const updateById = async(eventId : number, params: Partial<Event>/*, headers: Headers */) : Promise<Event> => {
-    // const session = await auth.api.getSession({
-    //     headers: headers
-    // });
+export const updateById = async(eventId : number, params: Partial<Event>, headers: Headers ) : Promise<Event> => {
+    const session = await auth.api.getSession({
+        headers: headers
+    });
 
-    // const auditInfo = {
-    //     userId: session?.user.id ?? "anonymous",
-    //     userEmail: session?.user.email ?? "unknown",
-    //     ip: headers.get("x-forwarded-for") || "unknown",
-    //     userAgent: headers.get("user-agent"),
-    //     referer: headers.get("referer"),
-    // };
+    const auditInfo = {
+        userId: session?.user.id ?? "anonymous",
+        userEmail: session?.user.email ?? "unknown",
+        ip: headers.get("x-forwarded-for") || "unknown",
+        userAgent: headers.get("user-agent"),
+        referer: headers.get("referer"),
+    };
 
-    // if (session?.user.role !== userRole.enumValues[0]){
-    //     getLogger().warn(`Unauthorized event UPDATE attempt: ${JSON.stringify(auditInfo)}`);
-    //     throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
-    // };
+    if (session?.user.role !== userRole.enumValues[0]){
+        getLogger().warn(`Unauthorized event UPDATE attempt: ${JSON.stringify(auditInfo)}`);
+        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+    };
     
     if (!eventId) throw ServiceError.badRequest("Geen ID meegegeven.");
     

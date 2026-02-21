@@ -160,7 +160,7 @@ To use the winston logger in the server, import and use getLogger like this:
 
 ```javascript
 getLogger().info("your info log");
-getLogger().warning("your warning log");
+getLogger().warn("your warning log");
 getLogger().error("your error log");
 ```
 
