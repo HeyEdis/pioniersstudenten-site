@@ -45,6 +45,6 @@ RUN cp -r .next/static .next/standalone/.next/static
 
 # Expose the port
 EXPOSE 3000
-
+run rm -rf .next
 # Start the application
 CMD ["bun", ".next/standalone/server.js"]
