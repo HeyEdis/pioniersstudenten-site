@@ -20,7 +20,7 @@ export const create = async(params: typeof event.$inferInsert, headers: Headers)
         referer: headers.get("referer"),
     };
 
-    if (session?.user.role !== userRole.enumValues[0]){
+    if (session?.user.role !== "Admin"){
         getLogger().warn(`Unauthorized event CREATE attempt: ${JSON.stringify(auditInfo)}`);
         throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
     };

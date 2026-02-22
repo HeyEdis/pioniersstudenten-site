@@ -22,6 +22,10 @@ async function main() {
     await db.delete(schema.resource);
     await db.delete(schema.faq);
 
+    await db.delete(schema.session);
+    await db.delete(schema.account);
+    await db.delete(schema.verification);
+
     /** 
      * After deleting all the data the id's don't reset to 1. 
      * To do this this piece of sql code needs to be executed.
@@ -35,7 +39,10 @@ async function main() {
             "addresses", 
             "admins", 
             "resources", 
-            "faq" 
+            "faq",
+            "session",
+            "account",
+            "verification"
         RESTART IDENTITY CASCADE
     `);
     

@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:18.1
-    restart: always
+    restart: no
     environment:
       POSTGRES_DB: '${POSTGRES_DB}'
       POSTGRES_USER: '${POSTGRES_USERNAME}'

@@ -19,11 +19,11 @@ export const AdminSelectSchema = createSelectSchema(admin);
 export const RegistrationSelectSchema = createSelectSchema(registrations);
 export const EventSelectSchema = createSelectSchema(event,{
     label: z.enum(["Toekomstige pioniersstudent", "Pioniersstudent"]),
-    title: z.string().nonempty("Titel mag niet leeg zijn."),
+    title: z.string().trim().min(1).nonempty("Titel mag niet leeg zijn."),
     date: z.string().nonempty("Datum is verplicht."),
     start_time: z.string().nonempty("Starttijd is verplicht."),
     end_time: z.string().nonempty("Eindtijd is verplicht."),
-    description: z.string().nonempty("Omschrijving mag niet leeg zijn."),
+    description: z.string().trim().min(1).nonempty("Omschrijving mag niet leeg zijn."),
     image: z.string().nullable(),
     created_at: z.date(),
     updated_at: z.date(),
@@ -38,11 +38,11 @@ export const AdminInsertSchema = createInsertSchema(admin);
 export const RegistrationInsertSchema = createInsertSchema(registrations);
 export const EventInsertSchema = createInsertSchema(event,{
     label: z.enum(["Toekomstige pioniersstudent", "Pioniersstudent"]),
-    title: z.string().nonempty("Titel mag niet leeg zijn."),
+    title: z.string().trim().min(1).nonempty("Titel mag niet leeg zijn."),
     date: z.string().nonempty("Datum is verplicht."),
     start_time: z.string().nonempty("Starttijd is verplicht."),
     end_time: z.string().nonempty("Eindtijd is verplicht."),
-    description: z.string().nonempty("Omschrijving mag niet leeg zijn."),
+    description: z.string().trim().min(1).nonempty("Omschrijving mag niet leeg zijn."),
     image: z.string().nullable(),
 });
 export const NotificationInsertSchema = createInsertSchema(notification);
@@ -55,11 +55,11 @@ export const AdminUpdateSchema = createUpdateSchema(admin);
 export const RegistrationUpdateSchema = createUpdateSchema(registrations);
 export const EventUpdateSchema = createUpdateSchema(event, {
     label: z.enum(["Toekomstige pioniersstudent", "Pioniersstudent"]),
-    title: z.string().nonempty("Titel mag niet leeg zijn."),
+    title: z.string().trim().min(1).nonempty("Titel mag niet leeg zijn."),
     date: z.string().nonempty("Datum is verplicht."),
     start_time: z.string().nonempty("Starttijd is verplicht."),
     end_time: z.string().nonempty("Eindtijd is verplicht."),
-    description: z.string().nonempty("Omschrijving mag niet leeg zijn."),
+    description: z.string().trim().min(1).nonempty("Omschrijving mag niet leeg zijn."),
     image: z.string().nullable(),
 });
 export const NotificationUpdateSchema = createUpdateSchema(notification);

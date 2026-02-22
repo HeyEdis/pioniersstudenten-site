@@ -2,9 +2,9 @@ import { UserRole } from "@/drizzle/zod";
 import { db } from "@/core/db";
 import { session, admin } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
+import { auth } from "@/core/auth";
 
 export const createClient = async (role: UserRole, userId: number) => {
-
   const [sessionByRole] = await db
     .select()
     .from(session)
@@ -15,18 +15,28 @@ export const createClient = async (role: UserRole, userId: number) => {
         eq(admin.id, userId)
       )
     )
-    .limit(1)
 
-    // 2. Return a custom fetcher
   return async (path: string, init?: RequestInit) => {
-    const baseUrl = process.env.BETTER_AUTH_URL;
-    
-    return fetch(`${baseUrl}${path}`, {
+    const base_url = "http://localhost:3000";
+    const url = `${base_url}${path}`
+
+    const { headers } = await auth.api.signInEmail({
+      returnHeaders: true,
+      body: {
+          email: sessionByRole.admins.email,
+          password: "password123"
+      }
+    });
+
+    const cookies = headers.get("set-cookie")?.split(" ",1);
+    const takingSemiColonOut = cookies?.toString().slice(0,-1);
+
+    return fetch(url, {
       ...init,
       headers: {
         ...init?.headers,
-        Cookie: `pioniersstudenten_session_id=${sessionByRole.session.id}`,
-      },
+        "Cookie": `${takingSemiColonOut}`,
+      }
     });
   };
 };

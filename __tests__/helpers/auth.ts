@@ -21,5 +21,5 @@ export const createUserSession = async (userId: number) => {
 };
 
 export const cleanupAllSessions = async () => {
-    await db.delete(session).execute();
+    await db.delete(session);
 };

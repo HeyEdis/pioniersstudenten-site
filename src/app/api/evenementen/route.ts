@@ -19,54 +19,31 @@ export async function GET() {
  * If it failed creating an event a suitable error message gets displayed. 
  */
 export async function POST(request: NextRequest) {
-  try {
+    try {
     const formData = await request.formData();
     const { headers } = request;
-    let event;
-    let validData;
+    const rawData = Object.fromEntries(formData.entries());
+    
+    const validData = EventInsertSchema.parse(rawData);
 
-    try {
-      event = Object.fromEntries(formData.entries());
-      validData = EventInsertSchema.parse(event);
-    } catch(error){
-      if (error instanceof ServiceError) {
-          return NextResponse.json(
-              { message: error.message },
-              { status: error.status }
-          );
-      }
-      if (error instanceof ZodError){
-          return NextResponse.json(
-              { message: error.issues.map(i => i.message) }, 
-              { status: 400 }
-          );
-      }
-      return NextResponse.json(
-         { message: "Er is een onverwachte fout opgetreden." },
-        { status: 500 }
-      );
-
-    }
     const createdEvent = await eventService.create(validData, headers);
-    return NextResponse.json(
-      { event: createdEvent })
 
-  } catch(error){
+    return NextResponse.json({ event: createdEvent });
+
+  } catch (error) {
     if (error instanceof ServiceError) {
-        return NextResponse.json(
-            { message: error.message },
-            { status: error.status }
-        );
+      return NextResponse.json(
+        { message: error.message }, 
+        { status: error.status });
     }
-    if (error instanceof ZodError){
-        return NextResponse.json(
-            { message: error.issues.map(i => i.message) }, 
-            { status: 400 }
-        );
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { message: error.issues.map(i => i.message) }, 
+        { status: 400 });
     }
+    
     return NextResponse.json(
-        { message: "Er is een onverwachte fout opgetreden." },
-        { status: 500 }
-    );
+        { message: "Er is een onverwachte fout opgetreden." }, 
+        { status: 500 });
   }
 };

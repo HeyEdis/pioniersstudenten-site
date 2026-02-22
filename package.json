@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun --bun next dev",
+    "dev": "bun --bun --env-file=.env next dev",
+    "dev:test": "bun --bun --env-file=.env.test next dev",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
     "lint": "eslint .",
@@ -11,8 +12,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "bun run ./src/drizzle/seed.ts",
-    "test:setup": "env-cmd -f .env.test drizzle-kit migrate && bun test:seed",
-    "test:seed": "env-cmd -f .env.test bun run ./src/drizzle/seed.ts"
+    "test:setup": "bun --env-file=.env.test drizzle-kit migrate && bun test:seed",
+    "test:seed": "bun --env-file=.env.test run ./src/drizzle/seed.ts",
+    "test": "bun test --env-file=.env.test"
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",
@@ -35,7 +37,6 @@
     "@types/react-dom": "^19",
     "@types/winston": "^2.4.4",
     "drizzle-kit": "^0.31.8",
-    "env-cmd": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",

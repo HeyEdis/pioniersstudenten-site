@@ -3,7 +3,7 @@ export const isProduction = () => {
 }
 
 export const isTesting = () => {
-    return process.env.APP_ENV === "testing";
+    return process.env.APP_ENV === "test";
 }
 
 export const isDevelopment = () => {
