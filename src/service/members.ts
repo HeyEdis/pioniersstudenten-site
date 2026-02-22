@@ -66,6 +66,39 @@ export const getById = async (memberId: number, headers: Headers) : Promise<{mem
     return memberById;
 }
 
+export const create = async(params: typeof members.$inferInsert, headers: Headers) :  Promise<Member> => {
+    const session = await auth.api.getSession({
+        headers: headers
+    });
+
+    const auditInfo = {
+        userId: session?.user.id ?? "anonymous",
+        userEmail: session?.user.email ?? "unknown",
+        ip: headers.get("x-forwarded-for") || "unknown",
+        userAgent: headers.get("user-agent"),
+        referer: headers.get("referer"),
+    };
+
+    if (session?.user.role !== userRole.enumValues[0]){
+        getLogger().warn(`Unauthorized member CREATE attempt: ${JSON.stringify(auditInfo)}`);
+        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+    };
+
+    try{
+        const [created] = await db
+            .insert(members)
+            .values(params)
+            .returning();
+
+    getLogger().info(`200: Member ${created.id} is created.`)
+    return created;
+    }catch(error){
+        getLogger().error(error);
+        throw handleDBError(error);
+    }
+};
+
+
 export const updateById = async(memberId : number, params: Partial<Member>, headers: Headers ) : Promise<Member> => {
     const session = await auth.api.getSession({
         headers: headers
