@@ -15,13 +15,6 @@
       "when": 1771348853345,
       "tag": "0001_aberrant_sue_storm",
       "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1771596906396,
-      "tag": "0002_careful_starfox",
-      "breakpoints": true
     }
   ]
 }
