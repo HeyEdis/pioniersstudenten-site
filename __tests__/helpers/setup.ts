@@ -17,9 +17,6 @@ export const createClient = async (role: UserRole, userId: number) => {
     )
 
   return async (path: string, init?: RequestInit) => {
-    const base_url = "http://localhost:3000";
-    const url = `${base_url}${path}`
-
     const { headers } = await auth.api.signInEmail({
       returnHeaders: true,
       body: {
@@ -31,7 +28,7 @@ export const createClient = async (role: UserRole, userId: number) => {
     const cookies = headers.get("set-cookie")?.split(" ",1);
     const takingSemiColonOut = cookies?.toString().slice(0,-1);
 
-    return fetch(url, {
+    return fetch(path, {
       ...init,
       headers: {
         ...init?.headers,

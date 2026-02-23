@@ -5,10 +5,8 @@ import z from "zod";
 import { event } from "@/drizzle/schema";
 import { db } from "@/core/db";
 import { eq } from "drizzle-orm";
-import { GET } from "@/app/api/evenementen/route";
-import { NextRequest } from "next/server";
 
-const base_url = "http://localhost:3000";
+const base_url = process.env.BETTER_AUTH_URL;
 
 describe("Event routes", () => {
   let adminClient: Awaited<ReturnType<typeof createClient>>;
@@ -26,10 +24,8 @@ describe("Event routes", () => {
 
   describe("Get all", () => {
     it("Should return all", async () => {
-      const request = new NextRequest(`${base_url}/api/evenementen`);
+      const response = await fetch(`${base_url}/api/evenementen`);
 
-      const response = await GET(request);
-      // const response = await fetch(`${base_url}/api/evenementen`);
       expect(response.ok).toBe(true);
     });
   });
@@ -74,7 +70,7 @@ describe("Event routes", () => {
         method: "POST",
         body: formData,
       });
-      expect(response.ok).toBe(false);      
+      expect(response.ok).toBe(false);
       expect(response.status).toBe(403);
       const responseBody = await response.json();
       expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");
@@ -88,8 +84,8 @@ describe("Event routes", () => {
       formData.append('end_time', '21:00');
       formData.append('description', 'Dit is een nieuw event.');
       formData.append('image', 'link');
-      
-      const response = await adminClient("/api/evenementen", {
+
+      const response = await adminClient(`${base_url}/api/evenementen`, {
         method: "POST",
         body: formData,
       });
@@ -107,7 +103,7 @@ describe("Event routes", () => {
       formData.append('description', 'halloo');
       formData.append('image', 'link');
 
-      const response = await adminClient(`/api/evenementen`, {
+      const response = await adminClient(`${base_url}/api/evenementen`, {
         method: "POST",
         body: formData,
       });
@@ -126,11 +122,11 @@ describe("Event routes", () => {
       formData.append('description', '');
       formData.append('image', 'link');
 
-      const response = await adminClient(`/api/evenementen`, {
+      const response = await adminClient(`${base_url}/api/evenementen`, {
         method: "POST",
         body: formData,
       });
-      
+
       expect(response.ok).toBe(false);
       expect(response.status).toBe(400);
     });
@@ -148,7 +144,7 @@ describe("Event routes", () => {
       formData.append('description', 'Dit is een nieuw event.');
       formData.append('image', 'link');
 
-      const response =  await adminClient(`/api/evenementen`, {
+      const response =  await adminClient(`${base_url}/api/evenementen`, {
         method: "POST",
         body: formData,
       });
@@ -158,7 +154,7 @@ describe("Event routes", () => {
 
       const responseBody = await response.json();
       newId = responseBody.event.id;
-      
+
       const parsedBody = z.object({event : z.object({
         label: z.string()
       })}).safeParse(responseBody);
@@ -171,9 +167,9 @@ describe("Event routes", () => {
       expect(eventInDb).toBeDefined();
       expect(eventInDb.label).toBe("Pioniersstudent");
     });
- 
+
     it("Should delete succesfully as admin", async () => {
-      const response = await adminClient(`/api/evenementen/${newId}`, {
+      const response = await adminClient(`${base_url}/api/evenementen/${newId}`, {
         method: "DELETE",
       });
       expect(response.ok).toBe(true);
@@ -189,11 +185,11 @@ describe("Event routes", () => {
       expect(response.ok).toBe(false);
       expect(response.status).toBe(403);
       const responseBody = await response.json();
-      expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");  
+      expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");
     });
 
     it("Should error when wrong id (negative)", async () => {
-      const response = await adminClient(`/api/evenementen/-1`, {
+      const response = await adminClient(`${base_url}/api/evenementen/-1`, {
         method: "DELETE",
       });
       expect(response.ok).toBe(false);
@@ -201,7 +197,7 @@ describe("Event routes", () => {
     });
 
     it("Should error when wrong id (non existing item)", async () => {
-      const response = await adminClient(`/api/evenementen/999`, {
+      const response = await adminClient(`${base_url}/api/evenementen/999`, {
         method: "DELETE",
       });
       expect(response.ok).toBe(false);
@@ -209,7 +205,7 @@ describe("Event routes", () => {
     });
 
     it("Should error when wrong id (letters)", async () => {
-      const response = await adminClient(`/api/evenementen/abc`, {
+      const response = await adminClient(`${base_url}/api/evenementen/abc`, {
         method: "DELETE",
       });
       expect(response.ok).toBe(false);
@@ -249,7 +245,7 @@ describe("Event routes", () => {
       formData.append('description', 'Dit is een updated event.');
       formData.append('image', 'link');
 
-      const response =  await adminClient(`/api/evenementen/2`, {
+      const response =  await adminClient(`${base_url}/api/evenementen/2`, {
         method: "PUT",
         body: formData,
       });
@@ -271,7 +267,7 @@ describe("Event routes", () => {
       formData.append('description', 'Dit is een updated event.');
       formData.append('image', 'link');
 
-      const response =  await adminClient(`/api/evenementen/-1`, {
+      const response =  await adminClient(`${base_url}/api/evenementen/-1`, {
         method: "PUT",
         body: formData,
       });
@@ -289,7 +285,7 @@ describe("Event routes", () => {
       formData.append('description', 'Dit is een updated event.');
       formData.append('image', 'link');
 
-      const response =  await adminClient(`/api/evenementen/999`, {
+      const response =  await adminClient(`${base_url}/api/evenementen/999`, {
         method: "PUT",
         body: formData,
       });
@@ -307,7 +303,7 @@ describe("Event routes", () => {
       formData.append('description', 'Dit is een updated event.');
       formData.append('image', 'link');
 
-      const response =  await adminClient(`/api/evenementen/abc`, {
+      const response =  await adminClient(`${base_url}/api/evenementen/abc`, {
         method: "PUT",
         body: formData,
       });
@@ -315,7 +311,4 @@ describe("Event routes", () => {
       expect(response.status).toBe(400);
     });
   });
-
-  
-
 });
