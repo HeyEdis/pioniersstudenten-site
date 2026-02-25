@@ -1,3 +1,7 @@
-export default function Evenementen() {
-  return <div>About</div>
+export default function About() {
+  return (
+    <div>
+      <h1>About</h1>
+    </div>
+  );
 }

@@ -4,11 +4,11 @@ import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
 export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
-export const userRole = pgEnum("userRole", ["Admin"]);
+export const userRole = pgEnum("userRole", ["Admin", "User"]);
 
 const timestamps = {
   created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at"),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 };
 
 export const members = pgTable("members", {
@@ -18,9 +18,9 @@ export const members = pgTable("members", {
   lastname: varchar("lastname", {length: 50}).notNull(),
   gender: genderTypes("gender").notNull(),
   email: varchar("email", {length: 255}).notNull().unique(),
-  phonenumber: varchar("phonenumber", {length:14}).notNull(),
-  has_payed: boolean("has_payed"),
-  is_student: boolean("is_student"),
+  phonenumber: varchar("phonenumber", {length:14}).notNull().unique(),
+  has_payed: boolean("has_payed").notNull(),
+  is_student: boolean("is_student").notNull(),
   ...timestamps
 });
 
@@ -37,7 +37,8 @@ export const address = pgTable("addresses", {
   street: varchar("street", {length: 255}).notNull(),
   housenumber: varchar("housenumber", {length: 10}).notNull(),
   city: varchar("city", {length: 80}).notNull(),
-  province: varchar("province", {length: 80}).notNull()
+  province: varchar("province", {length: 80}).notNull(),
+  ...timestamps
 });
 
 // One address can have many members
@@ -54,7 +55,7 @@ export const faq = pgTable("faq", {
 
 export const resource = pgTable("resources", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  type: resourceTypes("type"),
+  type: resourceTypes("type").notNull(),
   title: varchar("title", {length:200}).notNull(),
   url: text("url").notNull(),
   ...timestamps
@@ -75,11 +76,11 @@ export const admin = pgTable("admins", {
 
 export const registrations = pgTable("registrations", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  event_id: integer("event_id").references(() => event.id).notNull(), // given the id an FK constraint
+  event_id: integer("event_id").references(() => event.id, {onDelete: "cascade"}).notNull(), // given the id an FK constraint
   firstname: varchar("firstname", {length: 50}).notNull(),
   lastname: varchar("lastname", {length: 50}).notNull(),
   email: varchar("email", {length: 255}).notNull().unique(),
-  phonenumber: varchar("phonenumber", {length:14}).notNull(),
+  phonenumber: varchar("phonenumber", {length:14}).notNull().unique(),
   label: pioneerLabel("label"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
@@ -94,8 +95,8 @@ export const registrationRelations = relations(registrations, ({one}) => ({
 
 export const event = pgTable("events", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  label: pioneerLabel("label"),
-  title: varchar("title", {length:200}).notNull(),
+  label: pioneerLabel("label").notNull(),
+  title: varchar("title", {length:200}).notNull().unique(),
   date: date("date").notNull(),
   start_time: time("start_time").notNull(),
   end_time: time("end_time").notNull(),
@@ -112,7 +113,7 @@ export const eventRelations = relations(event, ({many}) => ({
 export const notification = pgTable("notifications", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   member_id: integer("member_id").references(() => members.id), // given the id an FK constraint,
-  registration_id: integer("registration_id").references(() => registrations.id), // given the id an FK constraint,
+  registration_id: integer("registration_id").references(() => registrations.id, {onDelete: "cascade"}), // given the id an FK constraint,
   title: varchar("title", {length:200}).notNull(),
   description: text("description").notNull(),
   is_new: boolean("is_new").default(true),

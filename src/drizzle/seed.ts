@@ -1,13 +1,11 @@
 import { db } from "../core/db";
 import { sql } from "drizzle-orm";
 import * as schema from "./schema";
-import { genderTypes, resourceTypes, pioneerLabel, userRole } from "./schema";
+import { genderTypes, resourceTypes, pioneerLabel } from "./schema";
 import { fakerNL_BE as faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import { getLogger } from "@/core/logging";
 import { auth } from "@/core/auth";
-
-const password = "wachtwoord123";
 
 async function main() {
     
@@ -24,6 +22,10 @@ async function main() {
     await db.delete(schema.resource);
     await db.delete(schema.faq);
 
+    await db.delete(schema.session);
+    await db.delete(schema.account);
+    await db.delete(schema.verification);
+
     /** 
      * After deleting all the data the id's don't reset to 1. 
      * To do this this piece of sql code needs to be executed.
@@ -37,7 +39,10 @@ async function main() {
             "addresses", 
             "admins", 
             "resources", 
-            "faq" 
+            "faq",
+            "session",
+            "account",
+            "verification"
         RESTART IDENTITY CASCADE
     `);
     
@@ -150,7 +155,7 @@ async function main() {
      * To get the id's we need to use .returning()
      */
     const addressIds: number[] = [];
-    for (let i = 0; i < 14; i++){
+    for (let i = 0; i < 28; i++){
         const [address] =  await db.insert(schema.address).values({
             street: faker.location.street(),
             housenumber: faker.number.int({min: 1, max: 300}).toString(),
@@ -169,7 +174,7 @@ async function main() {
      */
     const allMembers: (typeof schema.members.$inferInsert)[] = [];
     for (const id of addressIds){
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 2; i++) {
             allMembers.push({
                 address_id: id,
                 firstname: faker.person.firstName(),

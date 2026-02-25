@@ -2,8 +2,8 @@
 
 ## Technologies & Packages Used
 
-- [Next.js](https://nextjs.org/) - Fullstack.
-- [React](https://react.dev/) - Utilises React as a Frontend.
+- [Next.js](https://nextjs.org/) - Fullstack framework.
+- [React](https://react.dev/) - NextJS utilises React as it's frontend.
 - [Docker](https://www.docker.com/products/docker-desktop/) - To run local containers of the database.
 - [Bun](https://bun.com/) - All in one toolkit: bundler, javascript runtime, testrunner and package manager.
 - [Betterauth](https://www.better-auth.com/) - Authentication.
@@ -17,8 +17,8 @@
 - [Shadcn](https://ui.shadcn.com/) - Make own component library.
 - [Winston](https://github.com/winstonjs/winston) - Logging.
 - [Tanstackquery](https://tanstack.com/query/latest) - Data fetching from API.
-- [Eslint](https://eslint.org/) - Linter.
-- [Swagger](https://swagger.io/) - Generating documentation.
+- [Eslint](https://eslint.org/) - To enforce code formatting rules.
+- [Swagger](https://swagger.io/) - Generating API documentation.
 - [Recharts](https://github.com/recharts/recharts) - Chart library.
 - [Slick-carousel](https://github.com/kenwheeler/slick) - Carousel.
 - [Day.js](https://github.com/iamkun/dayjs) - Immutable date-time library.
@@ -36,9 +36,9 @@ Make sure you have:
 
 > On linux you need to install docker and the docker-compose packages(look for instructions for your distro). If you want a GUI look into [Lazydocker](https://github.com/jesseduffield/lazydocker), [Portrainer](https://github.com/portainer/portainer), [Podman](https://github.com/podman-desktop/podman-desktop) or something else.
 
-### Usefull GUI
+### Database GUI
 
-To check upon the seeded data in your local docker container it's usefull to install [pgAdmin](https://www.pgadmin.org/). It's a tool to look into your database and perform querries, generate ERD diagrams, etc.
+To check upon the seeded data in your local docker container it's usefull to install [pgAdmin](https://www.pgadmin.org/). It's a tool to look into your database and perform querries, generate ERD diagrams, etc. There is also [Dbbeaver](https://dbeaver.io/download/) this has a look and feel like mysql workbench, however you can use any database with it and have multiple different ones attached.
 
 Alternativly you can go into the docker GUI to the exec tab and execute `psql -U postgres -d pioniersstudenten` to connect to postgresSQL and then list all the tables with `\dt` and query the data with `SELECT * from events`.
 
@@ -127,7 +127,7 @@ POSTGRES_PASSWORD=kiesEenWachtwoord
 
 DATABASE_URL=postgres://postgres:kiesEenWachtwoord@localhost:5432/pioniersstudenten
 
-BETTER_AUTH_SECRET=FVFvp7yv7yYw8N3XuqN2ZUsTvGrOHwJh
+BETTER_AUTH_SECRET=<insert generated secret here>
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
@@ -136,7 +136,8 @@ Better-auth secret can be generated here: https://www.better-auth.com/docs/insta
 Example .env.test config:
 
 ```bash
-APP_ENV=testing
+APP_ENV=test
+LOG_LEVEL=error
 
 POSTGRES_DB=pioniersstudenten-test
 POSTGRES_USER=test
@@ -144,7 +145,12 @@ POSTGRES_PASSWORD=kiesEenWachtwoord
 TZ=Europe/Brussels
 
 DATABASE_URL=postgres://test:kiesEenWachtwoord@localhost:5434/pioniersstudenten-test
+
+BETTER_AUTH_SECRET=<insert generated secret here>
+BETTER_AUTH_URL=http://localhost:3000
 ```
+
+Better-auth secret can be generated here: https://www.better-auth.com/docs/installation#set-environment-variables
 
 ## Logging
 
@@ -154,7 +160,7 @@ To use the winston logger in the server, import and use getLogger like this:
 
 ```javascript
 getLogger().info("your info log");
-getLogger().warning("your warning log");
+getLogger().warn("your warning log");
 getLogger().error("your error log");
 ```
 
@@ -165,6 +171,16 @@ To log in the client side of the application just use the standard `console.log(
 There are config files for every environment and a default config in the `config` folder, these configs can be used for storing environment specific variables for things like logging, auth, docs, cors, ...
 
 You can also add custom environment variables from your `.env` in the `custom-environment-variables.ts` file.
+
+## Testing
+
+To run the tests you will need to setup your test db. This command applies the migrations and seeds the db. Also bun expects the `APP_ENV` variable to be named 'test' so make sure thats done.
+
+```bash
+bun test:setup
+```
+
+Afterwards, open a new terminal and run `bun dev:test` because the test runner needs an online instance and run in a seprate terminal `bun test` to execute them all.
 
 ## Learn More
 

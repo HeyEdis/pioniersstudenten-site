@@ -37,7 +37,7 @@ const rootLogger: winston.Logger = winston.createLogger({
   level: LOG_LEVEL,
   format: loggerFormat(),
   defaultMeta: { env: APP_ENV },
-  transports: APP_ENV === "testing" ? [
+  transports: APP_ENV === "test" ? [
     new winston.transports.File({
       filename: `logs/testing/${dayjs().format("YYYY-MM-DD")}.log`,
       silent: LOG_DISABLED,
