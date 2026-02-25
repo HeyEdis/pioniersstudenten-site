@@ -14,7 +14,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         const member = await memberService.getById(result.id, headers);
         const validatedMember = MemberByIdResponseSchema.parse(member);
 
-        return NextResponse.json(member);
+        return NextResponse.json(validatedMember);
     } catch (error) {
          if (error instanceof ServiceError) {
             return NextResponse.json(
