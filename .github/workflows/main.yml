@@ -1,6 +1,10 @@
 name: Build and Deploy Docker
 
 on:
+  push:
+    branches: 
+    - "*"
+    - "!main"
   pull_request:
     branches: [ "main" ]
 
