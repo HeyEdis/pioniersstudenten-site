@@ -180,7 +180,7 @@ To run the tests you will need to setup your test db. This command applies the m
 bun test:setup
 ```
 
-Afterwards, open a new terminal and run `bun dev` because the test runner needs an online instance and run `bun test` to execute them all.
+Afterwards, open a new terminal and run `bun dev:test` because the test runner needs an online instance and run in a seprate terminal `bun test` to execute them all.
 
 ## Learn More
 
