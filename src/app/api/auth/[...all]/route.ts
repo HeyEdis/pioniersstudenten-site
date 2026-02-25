@@ -1,4 +1,5 @@
-export const dynamic = "force-dynamic";
+import { auth } from "@/core/auth";
+import { toNextJsHandler } from "better-auth/next-js";
 
-// Hieronder staat waarschijnlijk jouw Better Auth code:
-// import { betterAuth } ...
+export const { POST, GET } = toNextJsHandler(auth);
+export const dynamic = "force-dynamic";
