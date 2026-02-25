@@ -1,7 +1,7 @@
 name: Build and Deploy Docker
 
 on:
-  push:
+  pull_request:
     branches: [ "main" ]
 
 jobs:
@@ -12,14 +12,17 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: main
-      # 1. Checkout the code
-      # - name: Checkout code
-      #   uses: actions/checkout@v4
-
-      # 2. Build the Docker image
       - name: Build Docker Image
-        # Updated image name to pioniersstudenten-site
-        run: docker build -t pioniersstudenten-site .
+        run: |
+          docker build \
+            --build-arg APP_ENV=production  \
+            --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+            --build-arg POSTGRES_USER=${{ secrets.POSTGRES_USERNAME }} \
+            --build-arg POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            --build-arg BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
+            --build-arg BETTER_AUTH_URL=http://localhost:3000 \
+            -t pioniersstudenten-site .
 
       # 3. Save the image to a tar file (for transfer)
       - name: Save Docker Image
@@ -54,11 +57,11 @@ jobs:
             docker system prune -a -f --volumes
             # Load the image from the tar file
             docker load -i pioniersstudenten-site.tar
-            
+
             # Stop and remove the old container (if it exists)
             docker stop pioniersstudenten-site || true
             docker rm pioniersstudenten-site || true
-            
+
             # Run the new container
             # Updated ports to 3000:3000
             # Added host gateway for DB connection
@@ -66,7 +69,14 @@ jobs:
               --name pioniersstudenten-site \
               -p 3000:3000 \
               --restart unless-stopped \
+              -e APP_ENV=production  \
+              -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+              -e POSTGRES_USER=${{ secrets.POSTGRES_USERNAME }} \
+              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
+              -e BETTER_AUTH_URL=http://localhost:3000 \
               pioniersstudenten-site
-            
+
             # Cleanup the tar file to save space
             rm pioniersstudenten-site.tar
