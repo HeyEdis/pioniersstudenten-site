@@ -24,6 +24,9 @@ jobs:
             --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
             --build-arg BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
             --build-arg BETTER_AUTH_URL=http://localhost:3000 \
+            --build-arg LOG_LEVEL=warning \
+            --build-arg LOG_DISABLED=false \
+            --build-arg BETTER_AUTH_SIGNUP_DISABLED=true \
             -t pioniersstudenten-site .
 
       # 3. Save the image to a tar file (for transfer)
@@ -78,6 +81,9 @@ jobs:
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               -e BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
               -e BETTER_AUTH_URL=http://localhost:3000 \
+              -e LOG_LEVEL=warning \
+              -e LOG_DISABLED=false \
+              -e BETTER_AUTH_SIGNUP_DISABLED=true \
               pioniersstudenten-site
 
             # Cleanup the tar file to save space
