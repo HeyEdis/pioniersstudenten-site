@@ -14,7 +14,8 @@ describe("Member routes", () => {
   beforeAll(async () => {
     await cleanupAllSessions();
 
-    adminClient = await createClient();
+    await createUserSession(1);
+    adminClient = await createClient("Admin", 1);
   })
 
   afterAll(async () => {
@@ -32,33 +33,41 @@ describe("Member routes", () => {
     });
 
     it("Should return all when requested by admin user", async () => {
-        const response = await adminClient(`${base_url}/api/members`);
-        console.log(response);
-        
+        const response = await adminClient(`${base_url}/api/members`);      
         expect(response.ok).toBe(true);
     });
   });
 
   describe("Get by id", () => {
-    it("Should return one event", async () => {
+    it("Should return unauthorized when requested by a non admin user", async () => {
       const response = await fetch(`${base_url}/api/members/1`);
-      expect(response.ok).toBe(true);
+
+      expect(response.ok).toBe(false);
+      expect(response.status).toBe(403);
+      const responseBody = await response.json();
+      expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");
     });
 
+    it("Should return one event when requested by admin", async () => {
+      const response = await adminClient(`${base_url}/api/members/1`);
+      expect(response.ok).toBe(true);
+    });
+    
+
     it("Should give an error for a negative id", async () => {
-      const response = await fetch(`${base_url}/api/members/-900`);
+      const response = await adminClient(`${base_url}/api/members/-900`);
       expect(response.ok).toBe(false);
       expect(response.status).toBe(404);
     });
 
     it("Should give an error for a wrong id", async () => {
-      const response = await fetch(`${base_url}/api/members/999`);
+      const response = await adminClient(`${base_url}/api/members/999`);
       expect(response.ok).toBe(false);
       expect(response.status).toBe(404);
     });
 
     it("Should give an error for letters as id", async () => {
-      const response = await fetch(`${base_url}/api/members/abc`);
+      const response = await adminClient(`${base_url}/api/members/abc`);
       expect(response.ok).toBe(false);
       expect(response.status).toBe(400);
     });
@@ -144,7 +153,7 @@ describe("Member routes", () => {
     });
   });
 
-  describe("Create and delete event as admin",() => {
+  describe("Create and delete member as admin",() => {
     let newId: number;
     it("Should create succesfully as admin", async () => {
       const formData = new FormData();
@@ -190,7 +199,7 @@ describe("Member routes", () => {
     });
   });
 
-  describe("Delete event", () => {
+  describe("Delete member", () => {
     it("Should return unauthorized when deleting by an non admin user", async () => {
       const response = await fetch(`${base_url}/api/members/9`, {
         method: "DELETE",
@@ -226,7 +235,7 @@ describe("Member routes", () => {
     });
   });
 
-  describe("Update event", () => {
+  describe("Update member", () => {
     it("Should return unauthorized when updating by an non admin user", async () => {
       const formData = new FormData();
       formData.append('firstname', 'Peter');

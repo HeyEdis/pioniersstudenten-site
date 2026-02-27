@@ -34,6 +34,8 @@ const handleDBError = (error : any) => {
         throw ServiceError.notFound('Dit event bestaat niet.');
       case message.includes('registrations'):
         throw ServiceError.notFound('Deze inschrijving bestaat niet.');
+      case message.includes('members'):
+        throw ServiceError.notFound('Dit lid bestaat niet.');
       default:
         throw ServiceError.notFound('Het opgevraagde item bestaat niet.');
     }
