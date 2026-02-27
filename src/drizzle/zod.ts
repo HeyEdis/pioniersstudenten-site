@@ -30,7 +30,16 @@ export const EventSelectSchema = createSelectSchema(event,{
 });
 export const NotificationSelectSchema = createSelectSchema(notification);
 
-export const MemberInsertSchema = createInsertSchema(members);
+export const MemberInsertSchema = createInsertSchema(members, {
+    firstname: z.string().trim().nonempty("voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("voornaam mag niet leeg zijn."),
+    gender: z.enum(["Male", "Female"]),
+    email: z.string().nonempty("email is verplicht."),
+    phonenumber: z.string().trim().max(14).nonempty("gsm-nummer mag niet leeg zijn."),
+    address_id: z.number().positive(),
+    has_payed: z.boolean(),
+    is_student: z.boolean(),
+});
 export const AddressInsertSchema = createInsertSchema(address);
 export const FaqInsertSchema = createInsertSchema(faq);
 export const ResourceInsertSchema = createInsertSchema(resource);
