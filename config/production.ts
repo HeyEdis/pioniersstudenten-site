@@ -4,6 +4,7 @@ export default {
     level: "warning",
   },
   betterauth: {
+    url: process.env.BETTER_AUTH_URL || "http://localhost:3000",
     signupdisabled: true
   }
 };
