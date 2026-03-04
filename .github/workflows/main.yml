@@ -3,7 +3,8 @@ name: Build and Deploy Docker
 on:
   pull_request:
     branches: [ "main" ]
-
+  push:
+    branches: [ "main" ]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -19,7 +20,7 @@ jobs:
             --build-arg POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
             --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
             --build-arg BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
-            --build-arg BETTER_AUTH_URL=http://localhost:3000 \
+            --build-arg BETTER_AUTH_URL=${{ vars.BETTER_AUTH_URL }} \
             --build-arg LOG_LEVEL=warning \
             --build-arg LOG_DISABLED=false \
             --build-arg BETTER_AUTH_SIGNUP_DISABLED=true \
@@ -76,7 +77,7 @@ jobs:
               -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               -e BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
-              -e BETTER_AUTH_URL=http://localhost:3000 \
+              -e BETTER_AUTH_URL=${{ vars.BETTER_AUTH_URL }} \
               -e LOG_LEVEL=warning \
               -e LOG_DISABLED=false \
               -e BETTER_AUTH_SIGNUP_DISABLED=true \

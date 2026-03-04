@@ -14,8 +14,7 @@ ARG BETTER_AUTH_URL
 ARG LOG_LEVEL
 ARG LOG_DISABLED
 ARG BETTER_AUTH_SIGNUP_DISABLED
-ENV NODE_ENV=production \
-    APP_ENV=$APP_ENV \
+ENV APP_ENV=$APP_ENV \
     POSTGRES_DB=$POSTGRES_DB \
     POSTGRES_USER=$POSTGRES_USER \
     POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
@@ -30,7 +29,6 @@ RUN bun run build
 # STAGE 2: Runner (Dit is de enige laag die Docker uiteindelijk exporteert!)
 FROM oven/bun:1-alpine AS runner
 WORKDIR /app
-ENV NODE_ENV=production
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
