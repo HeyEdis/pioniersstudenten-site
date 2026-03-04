@@ -1,0 +1,65 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres_test:
+        image: postgres:16.11
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB}}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5434:5432
+        options: --health-cmd="pg_isready -U testuser -d testdb" --health-interval=5s --health-timeout=5s --health-retries=10
+
+    env:
+      APP_ENV: testing
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
+      BETTER_AUTH_SIGNUP_DISABLED: false
+      LOG_LEVEL: warning
+      LOG_DISABLED: true
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run migrations & seed
+        run: bun run test:setup
+
+      - name: Start Next.js dev server
+        run: bun run dev:test &
+
+    #   - name: Wait for server to be ready
+    #     run: |
+    #       echo "Waiting for Next.js server..."
+    #       for i in $(seq 1 30); do
+    #         if curl -s http://localhost:3000 > /dev/null 2>&1; then
+    #           echo "Server is ready!"
+    #           exit 0
+    #         fi
+    #         echo "Attempt $i/30 - waiting 2s..."
+    #         sleep 2
+    #       done
+    #       echo "Server did not start in time"
+    #       exit 1
+
+      - name: Run tests
+        run: bun test
