@@ -26,34 +26,27 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const { headers } = request;
-    const rawData = Object.fromEntries(formData.entries());
+    const eventData = Object.fromEntries(formData.entries());
 
     const image = formData.get("image") as File
-
     const validImage = EventImageSchema.parse({image: image})
-    console.log("valid " + JSON.stringify(validImage))
 
     // 2. Convert File to a Buffer for Sharp
     const imageBuffer = await validImage.image.arrayBuffer();
 
     // Create name + path
-    const fileName = `event_${Date.now()}.webp`;
+    const fileName = `${crypto.randomUUID()}.webp`;
     const filePath = path.join(OUTPUT_PATH, fileName)
+    eventData.image = fileName;
+
+    const validatedEvent = EventInsertSchema.parse(eventData);
+
+    const createdEvent = await eventService.create(validatedEvent, headers);
 
     // 3. Process with Sharp
     await sharp(imageBuffer)
     .webp({ quality: 80 })
-    .toFile(`${filePath}`)
-
-    rawData.image = fileName;
-
-    // 7. Update your form data or database object
-    // You might need to save just the relative path ("/events/filename.webp") to your DB.
-
-
-    const validData = EventInsertSchema.parse(rawData);
-
-    const createdEvent = await eventService.create(validData, headers);
+    .toFile(filePath)
 
     return NextResponse.json({ event: createdEvent });
 

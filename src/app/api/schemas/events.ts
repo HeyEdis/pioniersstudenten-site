@@ -13,6 +13,6 @@ export const EventImageSchema = z.object({
     .refine((file) => file.size <= MAX_SIZE, `Maximum grootte van een afbeelding is 5MB.`)
     .refine(
       (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-      "Allen .jpg, .jpeg, .png and .webp formaten zijn toegestaan."
+      "Alleen .jpg, .jpeg, .png and .webp formaten zijn toegestaan."
     )
 })
