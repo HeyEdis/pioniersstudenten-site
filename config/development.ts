@@ -1,2 +1,3 @@
-export default {
-};
+const developmentConfig = {};
+
+export default developmentConfig;

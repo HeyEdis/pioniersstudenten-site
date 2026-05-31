@@ -1,4 +1,4 @@
-export default {
+const productionConfig = {
   env: process.env.APP_ENV || "production",
   log: {
     level: "warning",
@@ -8,3 +8,5 @@ export default {
     signupdisabled: true
   }
 };
+
+export default productionConfig;

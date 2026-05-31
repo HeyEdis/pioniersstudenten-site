@@ -1,7 +1,7 @@
 import ServiceError from "@/core/serviceError";
 
-const handleDBError = (error : any) => {
-  const { code = '', message } = error;
+const handleDBError = (error: unknown) => {
+  const { code = '', message = '' } = error as { code?: string; message?: string };
 
   /**
    * Unique constraint violation

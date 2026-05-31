@@ -1,4 +1,4 @@
-export default {
+const customEnvVars = {
   env: "APP_ENV",
   log: {
     level: "LOG_LEVEL",
@@ -14,3 +14,5 @@ export default {
     },
   },
 };
+
+export default customEnvVars;
