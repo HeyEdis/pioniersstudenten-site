@@ -28,7 +28,7 @@ jobs:
       BETTER_AUTH_URL: http://localhost:3000
       BETTER_AUTH_SIGNUP_DISABLED: false
       LOG_LEVEL: warning
-      LOG_DISABLED: "true"
+      LOG_DISABLED: false
 
     steps:
       - uses: actions/checkout@v6

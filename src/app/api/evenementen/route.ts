@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
         { status: 400 });
     }
     
+    console.error("Unhandled API Error (/api/evenementen):", error);
     return NextResponse.json(
         { message: "Er is een onverwachte fout opgetreden." }, 
         { status: 500 });
