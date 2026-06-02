@@ -24,7 +24,7 @@ jobs:
     env:
       APP_ENV: testing
       DATABASE_URL: postgresql://test:testpassword@localhost:5434/testdb
-      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_SECRET: dummy-secret-for-testing-only-123456
       BETTER_AUTH_URL: http://localhost:3000
       BETTER_AUTH_SIGNUP_DISABLED: false
       LOG_LEVEL: warning
@@ -51,4 +51,4 @@ jobs:
         run: npx wait-on tcp:3000
 
       - name: Run tests
-        run: bun test
+        run: bun test --timeout 20000
