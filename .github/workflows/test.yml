@@ -25,7 +25,7 @@ jobs:
       APP_ENV: testing
       DATABASE_URL: postgresql://test:testpassword@localhost:5434/testdb
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-      BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
+      BETTER_AUTH_URL: http://localhost:3000
       BETTER_AUTH_SIGNUP_DISABLED: false
       LOG_LEVEL: warning
       LOG_DISABLED: "true"
