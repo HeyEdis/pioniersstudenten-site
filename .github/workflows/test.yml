@@ -15,15 +15,15 @@ jobs:
         image: postgres:18.1
         env:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_USER: test
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5434:5432
-        options: --health-cmd="pg_isready -U ${{ secrets.POSTGRES_USERNAME }} -d ${{ secrets.POSTGRES_DB }}" --health-interval=5s --health-timeout=5s --health-retries=10
+        options: --health-cmd="pg_isready -U test -d ${{ secrets.POSTGRES_DB }}" --health-interval=5s --health-timeout=5s --health-retries=10
 
     env:
       APP_ENV: testing
-      DATABASE_URL: postgresql://${{ secrets.POSTGRES_USERNAME }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5434/${{ secrets.POSTGRES_DB }}
+      DATABASE_URL: postgresql://test:${{ secrets.POSTGRES_PASSWORD }}@localhost:5434/${{ secrets.POSTGRES_DB }}
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
       BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
       BETTER_AUTH_SIGNUP_DISABLED: false
