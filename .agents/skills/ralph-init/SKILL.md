@@ -49,12 +49,12 @@ An executable bash script that:
 - **Accepts `--feature=<name>` to resolve all paths from `docs/features/<name>/`**:
   - `--feature=custom-dashboards` → plan=`docs/features/custom-dashboards/plan.json`, prd=`docs/features/custom-dashboards/prd.md`, progress=`docs/features/custom-dashboards/progress.md`
 - Optionally takes `--plan=<path>` and `--prd=<path>` as manual overrides (take precedence over `--feature`)
-- Loops N times, each time calling `claude -p` with the iteration prompt, passing the plan file, progress.md, and optionally the PRD as context
+- Loops N times, each time calling `codex exec` with the iteration prompt, passing the plan file, progress.md, and optionally the PRD as context
 - After each iteration, checks stdout for `<promise>COMPLETE</promise>` — if found, exits early with a success message
-- Includes a `--hitl` flag that runs one interactive session (not `-p`) using `prompts/ralph-iteration-hitl.md`. The HITL prompt includes a review phase: after completing the task, Claude asks the user for feedback within the same session. If feedback is given, Claude updates guidance files (CLAUDE.md, rules, skills, prompts) to prevent the same mistakes in future iterations — all without leaving the session
+- Includes a `--hitl` flag that runs one interactive session using `prompts/ralph-iteration-hitl.md`. The HITL prompt includes a review phase: after completing the task, Codex asks the user for feedback within the same session. If feedback is given, Codex updates guidance files (AGENTS.md, rules, skills, prompts) to prevent the same mistakes in future iterations — all without leaving the session
 - Supports `--afk` flag for fully autonomous mode — implies `--yolo`, uses the AFK-specific prompt (`prompts/ralph-iteration-afk.md`) that instructs Ralph to make all decisions independently and document ADRs
-- Supports `--sandbox` flag to run inside `docker sandbox run claude` for AFK safety
-- Supports `--yolo` flag to run with `--dangerously-skip-permissions --permission-mode=bypassPermissions` for fully autonomous operation (no permission prompts)
+- Supports `--sandbox` flag to use Codex's built-in sandbox (`--sandbox danger-full-access`) for controlled execution
+- Supports `--yolo` flag to run with `--yolo` (`--dangerously-bypass-approvals-and-sandbox`) for fully autonomous operation (no approval prompts, no sandbox)
 
 Example structure:
 
@@ -102,9 +102,9 @@ else
   [ -z "$PROGRESS" ] && PROGRESS="progress.md"
 fi
 
-CLAUDE_FLAGS=""
+CODEX_FLAGS="--sandbox workspace-write"
 if [ "$YOLO" = true ]; then
-  CLAUDE_FLAGS="--dangerously-skip-permissions --permission-mode=bypassPermissions"
+  CODEX_FLAGS="--yolo"
 fi
 
 PROMPT_FILE="prompts/ralph-iteration.md"
@@ -125,18 +125,31 @@ for ((i=1; i<=ITERATIONS; i++)); do
 
   if [ "$HITL" = true ]; then
     # Interactive mode — user stays in the same session for review
-    claude $CLAUDE_FLAGS --append-system-prompt "$PROMPT" "$CONTEXT"
+    codex exec $CODEX_FLAGS "$PROMPT" "$CONTEXT"
   elif [ "$SANDBOX" = true ]; then
-    result=$(docker sandbox run claude $CLAUDE_FLAGS -p "$CONTEXT $PROMPT" | tee /dev/stderr)
+    result=$(codex exec --sandbox danger-full-access "$CONTEXT $PROMPT" | tee /dev/stderr)
   else
-    result=$(claude $CLAUDE_FLAGS -p "$CONTEXT $PROMPT" | tee /dev/stderr)
+    result=$(codex exec $CODEX_FLAGS "$CONTEXT $PROMPT" | tee /dev/stderr)
   fi
 
   if [ "$HITL" != true ] && [[ "$result" == *"<promise>COMPLETE</promise>"* ]]; then
-    echo "All tasks complete, exiting."
-    exit 0
+    echo "Plan ${STORY_NAME} complete!"
+    break
   fi
 done
+
+# Final check: are ALL plans now complete?
+ALL_DONE=true
+for f in $(ls "${PLANS_DIR}"/*.json 2>/dev/null); do
+  if grep -q '"passes": false' "$f"; then
+    ALL_DONE=false
+    break
+  fi
+done
+
+if [ "$ALL_DONE" = true ]; then
+  echo "All plans complete!"
+fi
 ```
 
 ### `prompts/ralph-iteration.md`
@@ -152,7 +165,7 @@ The prompt for a single Ralph iteration. It should instruct Claude to:
    - Standard features and implementation
    - Polish, cleanup, and quick wins
 4. Explore the codebase to understand relevant code before making changes
-5. Implement the task using TDD. **Every guard, service, helper, util, component, and container MUST have tests** — if you create a file, create its `.spec.ts` too. Follow the TDD skill (`~/.claude/skills/tdd/SKILL.md`) for red-green-refactor workflow. Skip TDD only for purely structural wiring (route config files, barrel exports, scaffolding).
+5. Implement the task using TDD. **Every guard, service, helper, util, component, and container MUST have tests** — if you create a file, create its `.spec.ts` too. Follow the TDD skill (`~/.agents/skills/tdd/SKILL.md`) for red-green-refactor workflow. Skip TDD only for purely structural wiring (route config files, barrel exports, scaffolding).
 6. Run ALL feedback loops before committing (use the project's actual commands):
    - Type checking
    - Tests
@@ -175,10 +188,10 @@ QUALITY:
 - Do not take shortcuts — follow the patterns already established in this codebase
 - Leave the codebase better than you found it
 - When modifying existing test files, reuse the existing test setup — never duplicate factories or providers
-- Read CLAUDE.md carefully for inject function preferences and coding conventions before writing code
+- Read AGENTS.md carefully for inject function preferences and coding conventions before writing code
 
 TDD: Every guard, service, helper, util, component, and container MUST have tests.
-     Follow ~/.claude/skills/tdd/SKILL.md for red-green-refactor workflow.
+     Follow ~/.agents/skills/tdd/SKILL.md for red-green-refactor workflow.
      Skip TDD only for purely structural wiring (route configs, barrel exports, scaffolding).
 
 ONLY WORK ON A SINGLE TASK PER ITERATION.
@@ -217,7 +230,7 @@ Key rules:
 If the user had no remarks and the session was smooth, skip this step.
 ```
 
-IMPORTANT: The review phase must NOT run git commands or generate a summary. The user reviews the code themselves. Claude just waits for feedback.
+IMPORTANT: The review phase must NOT run git commands or generate a summary. The user reviews the code themselves. Codex just waits for feedback.
 
 ### `prompts/ralph-iteration-afk.md`
 
@@ -251,7 +264,7 @@ DECISION MAKING:
   the codebase or PRD, document the blocker in the feature's progress.md, skip that task,
   and move on to the next one.
 
-TDD: Follow ~/.claude/skills/tdd/SKILL.md for any task with testable behavior.
+TDD: Follow ~/.agents/skills/tdd/SKILL.md for any task with testable behavior.
 - You decide which behaviors to test — prioritize critical paths and complex logic.
 - Do not skip TDD just because no human is watching. Tests are your safety net.
 - If acceptance criteria mention testable behavior, those MUST have tests.
