@@ -21,8 +21,8 @@ export const create = async(params: typeof event.$inferInsert, headers: Headers)
     };
 
     if (session?.user.role !== "Admin"){
-        getLogger().warn(`Unauthorized event CREATE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        getLogger().warn(`Forbidden event CREATE attempt: ${JSON.stringify(auditInfo)}`);
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 
     try{
@@ -92,8 +92,8 @@ export const updateById = async(eventId : number, params: Partial<Event>, header
     };
 
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized event UPDATE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        getLogger().warn(`Forbidden event UPDATE attempt: ${JSON.stringify(auditInfo)}`);
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
     
     if (!eventId) throw ServiceError.badRequest("Geen ID meegegeven.");
@@ -134,8 +134,8 @@ export const deleteById = async(eventId: number, headers : Headers) : Promise<vo
     };
 
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized event DELETE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        getLogger().warn(`Forbidden event DELETE attempt: ${JSON.stringify(auditInfo)}`);
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
     
     if(!eventId){throw ServiceError.notFound("Er is geen event met dit ID.")};

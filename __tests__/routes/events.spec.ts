@@ -56,7 +56,7 @@ describe("Event routes", () => {
   });
 
   describe("Create event", () => {
-    it("Should return unauthorized when creating by a non admin user", async () => {
+    it("Should return forbidden when creating by a non admin user", async () => {
       const formData = new FormData();
       formData.append('label', 'Pioniersstudent');
       formData.append('title', 'Nieuw event wauw');
@@ -178,7 +178,7 @@ describe("Event routes", () => {
   });
 
   describe("Delete event", () => {
-    it("Should return unauthorized when deleting by an non admin user", async () => {
+    it("Should return forbidden when deleting by an non admin user", async () => {
       const response = await fetch(`${base_url}/api/evenementen/9`, {
         method: "DELETE",
       });
@@ -214,7 +214,7 @@ describe("Event routes", () => {
   });
 
   describe("Update event", () => {
-    it("Should return unauthorized when updating by an non admin user", async () => {
+    it("Should return forbidden when updating by an non admin user", async () => {
       const formData = new FormData();
       formData.append('label', 'Pioniersstudent');
       formData.append('title', 'Nieuw event wauw');
