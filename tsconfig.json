@@ -23,8 +23,7 @@
       "@/app/*": ["./src/app/*"],
       "@/drizzle/*": ["./src/drizzle/*"],
       "@/core/*": ["./src/core/*"],
-      "@/service/*": ["./src/service/*"],
-      "@/lib/*": ["./src/lib/*"]
+      "@/service/*": ["./src/service/*"]
     }
   },
   "include": [

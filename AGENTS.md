@@ -58,6 +58,9 @@ be serving the app. Do not assume `bun test` alone is enough for route tests.
   - `@/drizzle/*`
   - `@/service/*`
   - `@/lib/*`
+  - `@/components/*`
+  - `@/components/ui/*`
+  - `@/hooks/*`
 - Use relative imports only for nearby private helpers in the same module area.
 - Keep imports explicit. Do not add barrel files unless the local codebase
   already moves in that direction.
@@ -150,17 +153,18 @@ for database access.
 
 ## Frontend Current State
 
-The frontend is still mostly starter-level. The intended direction is to set up
-shadcn with Base UI components, then use those as the source for needed
-components.
+The frontend uses shadcn with Base UI components. Reusable UI components live
+under `src/components/ui/` and shared UI utilities live in `src/lib/utils.ts`.
 
 When adding frontend work:
 
 - Use Next app-router pages under `src/app/`.
-- Once shadcn/Base UI is configured, use those components for reusable UI needs.
+- Always use shadcn components for reusable UI needs.
+- Add new shadcn components under `src/components/ui/`.
+- Use the existing `cn()` helper from `@/lib/utils` when composing conditional
+  Tailwind classes.
 - Use Tailwind classes for styling and layout.
-- Before shadcn/Base UI is configured, keep page components simple and avoid
-  introducing a different UI library.
+- Do not introduce a different UI library without explicit approval.
 - Replace starter content and metadata when working on user-facing pages.
 
 ## Environment And Local Services
