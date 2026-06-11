@@ -8,9 +8,10 @@ export const marieRegistration = {
 };
 
 export const sofieRegistration = {
-  ...marieRegistration,
+  event_id: 1,
   firstname: "Sofie",
   lastname: "Janssens",
   email: "sofie.janssens@example.com",
   phonenumber: "0470654321",
+  label: "Aspirante pioniersstudent",
 };
