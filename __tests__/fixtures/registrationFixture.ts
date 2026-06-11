@@ -1,4 +1,8 @@
-export const marieRegistration = {
+import { registrations } from "@/drizzle/schema";
+
+type RegistrationFixture = typeof registrations.$inferInsert;
+
+export const marieRegistration: RegistrationFixture = {
   event_id: 1,
   firstname: "Marie",
   lastname: "Peeters",
@@ -7,7 +11,7 @@ export const marieRegistration = {
   label: "Aspirante pioniersstudent",
 };
 
-export const sofieRegistration = {
+export const sofieRegistration: RegistrationFixture = {
   event_id: 1,
   firstname: "Sofie",
   lastname: "Janssens",
