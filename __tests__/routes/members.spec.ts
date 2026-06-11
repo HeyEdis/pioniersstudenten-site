@@ -90,7 +90,15 @@ describe("Member routes", () => {
     });
 
     it("Should error when there is missing (firstname)", async () => {
-      const { firstname, ...memberWithoutFirstname } = peterMember;
+      const memberWithoutFirstname = {
+        lastname: peterMember.lastname,
+        gender: peterMember.gender,
+        email: peterMember.email,
+        phonenumber: peterMember.phonenumber,
+        has_payed: peterMember.has_payed,
+        is_student: peterMember.is_student,
+        address_id: peterMember.address_id,
+      };
 
       const response = await adminClient(`${base_url}/api/members`, {
         method: "POST",
