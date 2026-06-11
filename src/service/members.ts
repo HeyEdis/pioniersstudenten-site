@@ -8,23 +8,18 @@ import handleDBError from "./_handleDbErrors";
 import { auth } from "@/core/auth";
 
 export const getAll = async (headers: Headers): Promise<{ members: Member; address: Address | null }[]> => {
+    const session = await auth.api.getSession({
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized member GET attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 
-    return await db.select().from(address).rightJoin(members, eq(address.id, members.address_id));
+    return await db
+        .select({ members, address })
+        .from(address)
+        .rightJoin(members, eq(address.id, members.address_id));
 };
 
 export const getById = async (memberId: number, headers: Headers): Promise<{ members: Member; address: Address | null }> => {
@@ -32,17 +27,8 @@ export const getById = async (memberId: number, headers: Headers): Promise<{ mem
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized member GET attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 
     if(!memberId){
@@ -51,7 +37,7 @@ export const getById = async (memberId: number, headers: Headers): Promise<{ mem
     };
 
     const [memberById] = await db
-        .select()
+        .select({ members, address })
         .from(address)
         .rightJoin(members, eq(address.id, members.address_id))
         .where(eq(members.id, memberId));
@@ -70,17 +56,8 @@ export const create = async(params: typeof members.$inferInsert, headers: Header
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized member CREATE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 
     try{
@@ -103,17 +80,8 @@ export const updateById = async(memberId : number, params: Partial<Member>, head
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized member UPDATE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 
     try {
@@ -143,17 +111,8 @@ export const deleteById = async(memberId: number, headers: Headers) : Promise<vo
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized member DELETE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 
     if(!memberId){

@@ -76,6 +76,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         await memberService.deleteById(result.id, headers);
 
         return NextResponse.json({ id: result.id });
+    } catch (error) {
         if (error instanceof ServiceError) {
             return NextResponse.json(
                 { message: error.message },
