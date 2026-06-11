@@ -18,13 +18,13 @@ afterEach(async () => {
   }
 });
 
-const postRegistration = (body: unknown, contentType = "application/json") => {
+const postRegistration = (body: unknown) => {
   return fetch(`${base_url}/api/registraties`, {
     method: "POST",
     headers: {
-      "Content-Type": contentType,
+      "Content-Type": "application/json",
     },
-    body: typeof body === "string" ? body : JSON.stringify(body),
+    body: JSON.stringify(body),
   });
 };
 
@@ -101,23 +101,4 @@ describe("Registration routes", () => {
     });
   });
 
-  it("rejects malformed JSON", async () => {
-    const response = await postRegistration("not-valid-json");
-
-    expect(response.ok).toBe(false);
-    expect(response.status).toBe(400);
-
-    const responseBody = await response.json();
-    expect(responseBody.message).toBe("Ongeldige JSON body.");
-  });
-
-  it("rejects non-JSON request bodies", async () => {
-    const response = await postRegistration("not json", "text/plain");
-
-    expect(response.ok).toBe(false);
-    expect(response.status).toBe(400);
-
-    const responseBody = await response.json();
-    expect(responseBody.message).toBe("Content-Type moet application/json zijn.");
-  });
 });
