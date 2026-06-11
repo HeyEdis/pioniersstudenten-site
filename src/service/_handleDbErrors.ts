@@ -13,6 +13,14 @@ const handleDBError = (error : unknown) => {
    */
   if (code === "23505") {
     switch (true) {
+      case message.includes('registrations_event_email_unique'):
+        throw ServiceError.conflict(
+          'Dit e-mailadres is al ingeschreven voor dit evenement.',
+        );
+      case message.includes('registrations_event_phonenumber_unique'):
+        throw ServiceError.conflict(
+          'Dit telefoonnummer is al ingeschreven voor dit evenement.',
+        );
       case message.includes('email'):
         throw ServiceError.badRequest(
           'Dit e-mail adres is al in gebruik.',

@@ -51,7 +51,7 @@
         "No Drizzle migration files are generated or edited as part of this task."
       ],
       "priority": 1,
-      "passes": false
+      "passes": true
     },
     {
       "id": "public-registration-create-endpoint",
