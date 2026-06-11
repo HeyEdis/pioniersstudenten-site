@@ -1,12 +1,48 @@
 import ServiceError from "@/core/serviceError";
 
+type DatabaseErrorLike = Error & {
+  cause?: unknown;
+  code?: unknown;
+  constraint?: unknown;
+  errno?: unknown;
+};
+
+const getDatabaseErrorDetails = (error: DatabaseErrorLike) => {
+  const cause = error.cause;
+  const databaseError =
+    cause instanceof Error && ("code" in cause || "errno" in cause || "constraint" in cause)
+      ? (cause as DatabaseErrorLike)
+      : error;
+
+  let code = "";
+  if (typeof databaseError.errno === "number") {
+    code = databaseError.errno.toString();
+  } else if (typeof databaseError.errno === "string") {
+    code = databaseError.errno;
+  } else if (typeof databaseError.code === "string") {
+    code = databaseError.code;
+  }
+  const messageParts = [
+    error.message,
+    databaseError.message,
+    typeof databaseError.constraint === "string" ? databaseError.constraint : "",
+  ];
+
+  return {
+    code,
+    message: messageParts.join(" "),
+  };
+};
+
 const handleDBError = (error : unknown) => {
-  if (!(error instanceof Error) || !("code" in error)) {
+  if (
+    !(error instanceof Error) ||
+    (!("code" in error) && !("cause" in error))
+  ) {
     throw error;
   }
 
-  const code = typeof error.code === "string" ? error.code : "";
-  const message = error.message;
+  const { code, message } = getDatabaseErrorDetails(error);
 
   /**
    * Unique constraint violation

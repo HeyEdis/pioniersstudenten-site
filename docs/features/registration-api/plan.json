@@ -67,7 +67,7 @@
         "Route tests for the success path and required-field validation live under __tests__/routes/ and use Bun test conventions."
       ],
       "priority": 2,
-      "passes": false
+      "passes": true
     },
     {
       "id": "public-registration-business-rules",

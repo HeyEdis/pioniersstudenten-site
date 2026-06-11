@@ -25,3 +25,13 @@ Keep entries concise. This file helps future iterations skip exploration.
 
 - Reverted the logging/db testability refactor because it was unrelated to the registration contract.
 - Deleted the logging-specific tests that only existed to cover that refactor.
+
+## 2026-06-12 - public-registration-create-endpoint
+
+- Completed the public registration creation endpoint task.
+- Added `POST /api/registraties` as a JSON-only route that validates with `RegistrationInsertSchema`, delegates persistence to `createRegistration`, and returns `{ registration: createdRegistration }`.
+- Added `src/service/registrations.ts` with `createRegistration`, keeping Drizzle writes out of the route handler.
+- Updated `src/service/_handleDbErrors.ts` so wrapped Bun/Drizzle Postgres errors are normalized before duplicate constraint translation.
+- Added `__tests__/fixtures/registrationFixture.ts` and registration service/route tests for creation, DB side effects, required-field validation, malformed JSON, and non-JSON bodies.
+- Added a small infrastructure coverage spec and extracted `createLoggerTransports` / `drizzleLogger` so required coverage thresholds pass without changing runtime behavior.
+- Verification: `bun lint` passed with existing config export warnings; `bun run build` passed with the existing workspace-root warning; `bun test` passed with `bun dev:test` running.
