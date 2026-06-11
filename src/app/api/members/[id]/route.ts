@@ -72,11 +72,10 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         const { id } = await params;
         const { headers } = request;
 
-        const result = MemberByIdQuerySchema.parse({id})
-        const member = await memberService.deleteById(result.id, headers)
+        const result = MemberByIdQuerySchema.parse({ id });
+        await memberService.deleteById(result.id, headers);
 
-        return NextResponse.json({id: member});
-    } catch (error) {
+        return NextResponse.json({ id: result.id });
         if (error instanceof ServiceError) {
             return NextResponse.json(
                 { message: error.message },

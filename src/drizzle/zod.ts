@@ -32,7 +32,7 @@ export const NotificationSelectSchema = createSelectSchema(notification);
 
 export const MemberInsertSchema = createInsertSchema(members, {
     firstname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
-    lastname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("Achternaam mag niet leeg zijn."),
     gender: z.enum(["Male", "Female"]),
     email: z.string().nonempty("Email is verplicht."),
     phonenumber: z.string().trim().max(14).nonempty("Gsm-nummer mag niet leeg zijn."),
@@ -58,7 +58,7 @@ export const NotificationInsertSchema = createInsertSchema(notification);
 
 export const MemberUpdateSchema = createUpdateSchema(members, {
     firstname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
-    lastname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("Achternaam mag niet leeg zijn."),
     gender: z.enum(["Male", "Female"]),
     email: z.string().nonempty("Email is verplicht."),
     phonenumber: z.string().trim().max(14).nonempty("Gsm-nummer mag niet leeg zijn."),

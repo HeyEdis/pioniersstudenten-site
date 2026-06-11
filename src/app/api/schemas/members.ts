@@ -7,5 +7,5 @@ export const MemberByIdQuerySchema = z.object({
 
 export const MemberByIdResponseSchema = z.object({
   members: MemberSelectSchema,
-  addresses: AddressSelectSchema || z.null()
-})
+  address: AddressSelectSchema.nullable(),
+});

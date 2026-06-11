@@ -7,8 +7,7 @@ import { eq } from "drizzle-orm";
 import handleDBError from "./_handleDbErrors";
 import { auth } from "@/core/auth";
 
-export const getAll = async (headers: Headers) : Promise<{members: Member, addresses: Address | null}[]> => {
-    const session = await auth.api.getSession({
+export const getAll = async (headers: Headers): Promise<{ members: Member; address: Address | null }[]> => {
         headers: headers
     });
 
@@ -28,7 +27,7 @@ export const getAll = async (headers: Headers) : Promise<{members: Member, addre
     return await db.select().from(address).rightJoin(members, eq(address.id, members.address_id));
 };
 
-export const getById = async (memberId: number, headers: Headers) : Promise<{members: Member, addresses: Address | null}> => {
+export const getById = async (memberId: number, headers: Headers): Promise<{ members: Member; address: Address | null }> => {
     const session = await auth.api.getSession({
         headers: headers
     });
