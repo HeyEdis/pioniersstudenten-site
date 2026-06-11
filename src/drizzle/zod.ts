@@ -44,7 +44,29 @@ export const AddressInsertSchema = createInsertSchema(address);
 export const FaqInsertSchema = createInsertSchema(faq);
 export const ResourceInsertSchema = createInsertSchema(resource);
 export const AdminInsertSchema = createInsertSchema(admin);
-export const RegistrationInsertSchema = createInsertSchema(registrations);
+export const RegistrationInsertSchema = createInsertSchema(registrations, {
+    event_id: z.coerce
+        .number({
+            error: "Evenement ID moet een getal zijn.",
+        })
+        .int("Evenement ID moet een geheel getal zijn.")
+        .positive("Evenement ID moet een positief getal zijn."),
+    firstname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("Achternaam mag niet leeg zijn."),
+    email: z
+        .string()
+        .trim()
+        .nonempty("E-mailadres is verplicht.")
+        .email("E-mailadres is ongeldig."),
+    phonenumber: z
+        .string()
+        .trim()
+        .nonempty("Gsm-nummer mag niet leeg zijn.")
+        .max(14, "Gsm-nummer mag maximaal 14 tekens bevatten."),
+    label: z.enum(pioneerLabel.enumValues, {
+        error: "Ongeldig label.",
+    }),
+});
 export const EventInsertSchema = createInsertSchema(event,{
     label: z.enum(["Aspirante pioniersstudent", "Pioniersstudent"]),
     title: z.string().trim().min(1).nonempty("Titel mag niet leeg zijn."),

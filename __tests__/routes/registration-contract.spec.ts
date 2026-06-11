@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { RegistrationCreateSchema } from "@/app/api/schemas/registrations";
+import { RegistrationInsertSchema } from "@/drizzle/zod";
 import { registrations } from "@/drizzle/schema";
 import handleDBError from "@/service/_handleDbErrors";
 
@@ -31,7 +31,7 @@ const getRegistrationConstraintNames = () => {
 
 describe("Registration contract", () => {
   it("validates and trims public registration creation input", () => {
-    const parsed = RegistrationCreateSchema.parse(validRegistration);
+    const parsed = RegistrationInsertSchema.parse(validRegistration);
 
     expect(parsed).toEqual({
       ...validRegistration,
@@ -41,7 +41,7 @@ describe("Registration contract", () => {
   });
 
   it("rejects invalid public registration creation input", () => {
-    const result = RegistrationCreateSchema.safeParse({
+    const result = RegistrationInsertSchema.safeParse({
       event_id: 0,
       firstname: "   ",
       lastname: "",
