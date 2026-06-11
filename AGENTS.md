@@ -154,6 +154,11 @@ for database access.
 - For API behavior, add or update tests under `__tests__/routes/`.
 - Prefer route-level tests that exercise the running Next server with `fetch`.
 - Use helpers in `__tests__/helpers/` for auth/session setup.
+- Put repeated test data in fixtures under `__tests__/fixtures/` instead of
+  duplicating full object literals across tests. Follow the existing
+  `memberFixture.ts` pattern for domain records with many required properties,
+  and compose small per-test overrides from those fixtures when only one or two
+  fields differ.
 - Cover success paths, validation failures, auth failures, and not-found cases
   for API changes.
 - The Bun test config lives in `bunfig.toml` and collects coverage under
