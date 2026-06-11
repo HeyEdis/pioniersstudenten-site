@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import ServiceError from "@/core/serviceError";
 import { RegistrationInsertSchema } from "@/drizzle/zod";
-import { createRegistration } from "@/service/registrations";
+import { create } from "@/service/registrations";
 import { ZodError } from "zod";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const validData = RegistrationInsertSchema.parse(body);
-    const createdRegistration = await createRegistration(validData);
+    const createdRegistration = await create(validData);
 
     return NextResponse.json({ registration: createdRegistration });
   } catch (error) {

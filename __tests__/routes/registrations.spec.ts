@@ -1,21 +1,36 @@
-import { afterEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { db } from "@/core/db";
 import { registrations } from "@/drizzle/schema";
-import { createRegistration } from "@/service/registrations";
-import { eq } from "drizzle-orm";
+import { create } from "@/service/registrations";
+import { eq, inArray } from "drizzle-orm";
 import { marieRegistration, sofieRegistration } from "../fixtures/registrationFixture";
 
 const base_url = process.env.BETTER_AUTH_URL;
 const createdRegistrationIds: number[] = [];
+const fixtureEmails = [
+  marieRegistration.email,
+  sofieRegistration.email,
+];
 
 const trackRegistration = (id: number) => {
   createdRegistrationIds.push(id);
 };
 
+const cleanupRegistrationFixtures = async () => {
+  await db
+    .delete(registrations)
+    .where(inArray(registrations.email, fixtureEmails));
+};
+
+beforeEach(async () => {
+  await cleanupRegistrationFixtures();
+});
+
 afterEach(async () => {
   for (const id of createdRegistrationIds.splice(0)) {
     await db.delete(registrations).where(eq(registrations.id, id));
   }
+  await cleanupRegistrationFixtures();
 });
 
 const postRegistration = (body: unknown) => {
@@ -32,7 +47,7 @@ describe("Registration service", () => {
   it("creates a registration", async () => {
     const registrationData = marieRegistration;
 
-    const created = await createRegistration(registrationData);
+    const created = await create(registrationData);
     trackRegistration(created.id);
 
     expect(created.id).toBeNumber();
@@ -52,10 +67,10 @@ describe("Registration service", () => {
   it("translates database insert errors", async () => {
     const registrationData = marieRegistration;
 
-    const created = await createRegistration(registrationData);
+    const created = await create(registrationData);
     trackRegistration(created.id);
 
-    await expect(createRegistration(registrationData)).rejects.toThrow(
+    await expect(create(registrationData)).rejects.toThrow(
       "Dit e-mailadres is al ingeschreven voor dit evenement.",
     );
   });

@@ -4,7 +4,7 @@ import { registrations } from "@/drizzle/schema";
 import { Registration } from "@/drizzle/zod";
 import handleDBError from "./_handleDbErrors";
 
-export const createRegistration = async (
+export const create = async (
   params: typeof registrations.$inferInsert,
 ): Promise<Registration> => {
   try {
