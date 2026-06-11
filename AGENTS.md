@@ -74,6 +74,14 @@ Route handlers should stay small:
 - Use JSON request bodies for endpoints that only accept plain structured data.
 - Validate input with Zod schemas from `src/drizzle/zod.ts` or API-specific
   schemas under `src/app/api/schemas/`.
+- Put table-backed request/response validation in `src/drizzle/zod.ts` by
+  customizing the Drizzle-derived select, insert, update, and enum schemas.
+  This includes create/update body schemas for persisted domain rows.
+- Use `src/app/api/schemas/` only for smaller route-local schemas that are not
+  direct table insert/update/select contracts, such as path/query parameter
+  schemas and composed response shapes. Existing examples include
+  `EventByIdQuerySchema`, `MemberByIdQuerySchema`, and
+  `MemberByIdResponseSchema`.
 - Call a service function for business logic and database work.
 - Translate known errors into HTTP responses in the route handler.
 
