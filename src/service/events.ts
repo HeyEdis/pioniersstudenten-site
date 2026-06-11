@@ -12,17 +12,8 @@ export const create = async(params: typeof event.$inferInsert, headers: Headers)
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== "Admin"){
-        getLogger().warn(`Unauthorized event CREATE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 
     try{
@@ -83,17 +74,8 @@ export const updateById = async(eventId : number, params: Partial<Event>, header
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized event UPDATE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
     
     if (!eventId) throw ServiceError.badRequest("Geen ID meegegeven.");
@@ -125,17 +107,8 @@ export const deleteById = async(eventId: number, headers : Headers) : Promise<vo
         headers: headers
     });
 
-    const auditInfo = {
-        userId: session?.user.id ?? "anonymous",
-        userEmail: session?.user.email ?? "unknown",
-        ip: headers.get("x-forwarded-for") || "unknown",
-        userAgent: headers.get("user-agent"),
-        referer: headers.get("referer"),
-    };
-
     if (session?.user.role !== userRole.enumValues[0]){
-        getLogger().warn(`Unauthorized event DELETE attempt: ${JSON.stringify(auditInfo)}`);
-        throw ServiceError.unauthorized("Gebruiker heeft geen toegang.")
+        throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
     
     if(!eventId){throw ServiceError.notFound("Er is geen event met dit ID.")};

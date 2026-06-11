@@ -3,7 +3,6 @@
 ## Technologies & Packages Used
 
 - [Next.js](https://nextjs.org/) - Fullstack framework.
-- [React](https://react.dev/) - NextJS utilises React as it's frontend.
 - [Docker](https://www.docker.com/products/docker-desktop/) - To run local containers of the database.
 - [Bun](https://bun.com/) - All in one toolkit: bundler, javascript runtime, testrunner and package manager.
 - [Betterauth](https://www.better-auth.com/) - Authentication.
@@ -19,8 +18,6 @@
 - [Tanstackquery](https://tanstack.com/query/latest) - Data fetching from API.
 - [Eslint](https://eslint.org/) - To enforce code formatting rules.
 - [Swagger](https://swagger.io/) - Generating API documentation.
-- [Recharts](https://github.com/recharts/recharts) - Chart library.
-- [Slick-carousel](https://github.com/kenwheeler/slick) - Carousel.
 - [Day.js](https://github.com/iamkun/dayjs) - Immutable date-time library.
 - [Faker](https://v10.fakerjs.dev/) - For generating mock data.
 
@@ -38,7 +35,7 @@ Make sure you have:
 
 ### Database GUI
 
-To check upon the seeded data in your local docker container it's usefull to install [pgAdmin](https://www.pgadmin.org/). It's a tool to look into your database and perform querries, generate ERD diagrams, etc. There is also [Dbbeaver](https://dbeaver.io/download/) this has a look and feel like mysql workbench, however you can use any database with it and have multiple different ones attached.
+To check upon the seeded data in your local docker container it's usefull to install [Dbbeaver](https://dbeaver.io/download/) this has a look and feel like mysql workbench, however you can use any database with it and have multiple different ones attached.
 
 Alternativly you can go into the docker GUI to the exec tab and execute `psql -U postgres -d pioniersstudenten` to connect to postgresSQL and then list all the tables with `\dt` and query the data with `SELECT * from events`.
 
@@ -174,13 +171,13 @@ You can also add custom environment variables from your `.env` in the `custom-en
 
 ## Testing
 
-To run the tests you will need to setup your test db. This command applies the migrations and seeds the db. Also bun expects the `APP_ENV` variable to be named 'test' so make sure thats done.
+To run the tests you will need to setup your test db. This command applies the migrations and seeds the db. Also bun expects the `APP_ENV` variable to be named 'test'.
 
 ```bash
 bun test:setup
 ```
 
-Afterwards, open a new terminal and run `bun dev:test` because the test runner needs an online instance and run in a seprate terminal `bun test` to execute them all.
+Afterwards, open a seperate terminal and run `bun dev:test` the test runner needs an online instance. Afterwards in a new therminal run `bun test` to execute them all.
 
 ## Learn More
 

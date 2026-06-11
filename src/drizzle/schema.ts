@@ -3,7 +3,7 @@ import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar
 
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
-export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
+export const pioneerLabel = pgEnum("pioneerLabel",["Aspirante pioniersstudent", "Pioniersstudent"]);
 export const userRole = pgEnum("userRole", ["Admin", "User"]);
 
 const timestamps = {
@@ -33,7 +33,7 @@ export const membersRelations = relations(members, ({one}) => ({
 }))
 
 export const address = pgTable("addresses", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(), 
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   street: varchar("street", {length: 255}).notNull(),
   housenumber: varchar("housenumber", {length: 10}).notNull(),
   city: varchar("city", {length: 80}).notNull(),
@@ -47,7 +47,7 @@ export const addressRelations = relations(address, ({many}) => ({
 }));
 
 export const faq = pgTable("faq", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(), 
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   ...timestamps

@@ -1,7 +1,12 @@
 import ServiceError from "@/core/serviceError";
 
-const handleDBError = (error : any) => {
-  const { code = '', message } = error;
+const handleDBError = (error : unknown) => {
+  if (!(error instanceof Error) || !("code" in error)) {
+    throw error;
+  }
+
+  const code = typeof error.code === "string" ? error.code : "";
+  const message = error.message;
 
   /**
    * Unique constraint violation
