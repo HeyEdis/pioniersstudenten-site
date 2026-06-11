@@ -8,13 +8,13 @@ import { getLogger } from "@/core/logging";
 import { auth } from "@/core/auth";
 
 async function main() {
-    
+
     // Clear existing data
     getLogger().info("Cleaning up database.");
     await db.delete(schema.notification);
     await db.delete(schema.registrations);
     await db.delete(schema.members);
-    
+
     await db.delete(schema.event);
     await db.delete(schema.address);
 
@@ -26,28 +26,28 @@ async function main() {
     await db.delete(schema.account);
     await db.delete(schema.verification);
 
-    /** 
-     * After deleting all the data the id's don't reset to 1. 
+    /**
+     * After deleting all the data the id's don't reset to 1.
      * To do this this piece of sql code needs to be executed.
-     * */ 
+     * */
     await db.execute(sql`
-        TRUNCATE TABLE 
-            "notifications", 
-            "registrations", 
-            "members", 
-            "events", 
-            "addresses", 
-            "admins", 
-            "resources", 
+        TRUNCATE TABLE
+            "notifications",
+            "registrations",
+            "members",
+            "events",
+            "addresses",
+            "admins",
+            "resources",
             "faq",
             "session",
             "account",
             "verification"
         RESTART IDENTITY CASCADE
     `);
-    
+
     getLogger().info("🌱 Seeding database...");
-    
+
     await auth.api.signUpEmail({
         body: {
 		    email: "admin@example.com",
@@ -101,7 +101,7 @@ async function main() {
         },
     ];
 
-    await db.insert(schema.faq).values(faq);    
+    await db.insert(schema.faq).values(faq);
     getLogger().info("FAQ's created!");
 
     const resources: (typeof schema.resource.$inferInsert)[] = [
@@ -147,7 +147,7 @@ async function main() {
         }
     ];
 
-    await db.insert(schema.resource).values(resources);    
+    await db.insert(schema.resource).values(resources);
     getLogger().info("Resources created!");
 
     /**
@@ -279,7 +279,7 @@ async function main() {
                 event_id: eventId,
                 firstname: faker.person.firstName(),
                 lastname: faker.person.lastName(),
-                email: `student_${i}_${j}@example.com`, 
+                email: `student_${i}_${j}@example.com`,
                 phonenumber: faker.phone.number({ style: "international" }),
                 label: i % 2 === 0 ? pioneerLabel.enumValues[1] : pioneerLabel.enumValues[0]
             });

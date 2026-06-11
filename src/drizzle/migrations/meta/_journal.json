@@ -29,6 +29,13 @@
       "when": 1781203579286,
       "tag": "0003_perfect_lady_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781218172175,
+      "tag": "0004_brief_shadow_king",
+      "breakpoints": true
     }
   ]
 }
