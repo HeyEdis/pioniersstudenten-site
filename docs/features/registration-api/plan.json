@@ -1,0 +1,125 @@
+{
+  "sources": [
+    {
+      "url": "conversation://current-thread",
+      "description": "User interview in this conversation: original feature request and locked API/business-rule decisions."
+    },
+    {
+      "url": "https://github.com/HeyEdis/pioniersstudenten-site.git",
+      "description": "Implementation repository for the Next.js/Bun/Drizzle app."
+    },
+    {
+      "url": "file://src/drizzle/schema.ts",
+      "description": "Existing registration schema, including current global email/phone uniqueness that must change."
+    },
+    {
+      "url": "file://src/service/events.ts",
+      "description": "Existing event service patterns for service-layer responsibilities, admin authorization, logging, and error handling."
+    },
+    {
+      "url": "file://src/app/api/evenementen",
+      "description": "Existing event API route patterns for thin handlers and HTTP error translation."
+    },
+    {
+      "url": "file://__tests__/routes/members.spec.ts",
+      "description": "Existing route/integration test conventions for validation, Dutch errors, auth helpers, and database side effects."
+    },
+    {
+      "url": "file://src/core/serviceError.ts",
+      "description": "Existing ServiceError status-code mapping used by API route handlers."
+    },
+    {
+      "url": "file://src/service/_handleDbErrors.ts",
+      "description": "Existing database constraint translation helper to extend or mirror for registration duplicate handling."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "registration-schema-validation-contract",
+      "title": "Registration schema and validation contract",
+      "description": "Update the registration data contract so the database and Zod validation match the PRD. Replace the current global unique constraints on registration email and phone number in src/drizzle/schema.ts with composite unique constraints for event_id plus email and event_id plus phonenumber. Keep created_at and do not add updated_at. Update src/drizzle/zod.ts and/or add API-specific schemas under src/app/api/schemas/ so registration creation accepts JSON fields event_id, firstname, lastname, email, phonenumber, and label with the PRD validation rules. Translate registration duplicate database constraint errors into precise Dutch 409 ServiceError responses for duplicate email and duplicate phone. Do not generate Drizzle migrations in this task; note that the developer must run bun db:generate separately.",
+      "acceptance_criteria": [
+        "src/drizzle/schema.ts defines composite unique constraints for registrations on event_id/email and event_id/phonenumber, and no longer defines global unique constraints on registration email or phonenumber.",
+        "Registration creation validation requires event_id, firstname, lastname, email, phonenumber, and label.",
+        "event_id validation rejects non-positive or non-numeric values with HTTP 400 when used through the API.",
+        "firstname and lastname are trimmed and reject empty strings with Dutch validation messages.",
+        "email validation rejects invalid email formats with HTTP 400.",
+        "phonenumber validation rejects empty values and values longer than 14 characters with Dutch validation messages.",
+        "label validation accepts only Aspirante pioniersstudent and Pioniersstudent.",
+        "Database unique constraint violations for same-event duplicate email map to status 409 and message Dit e-mailadres is al ingeschreven voor dit evenement.",
+        "Database unique constraint violations for same-event duplicate phone number map to status 409 and message Dit telefoonnummer is al ingeschreven voor dit evenement.",
+        "No Drizzle migration files are generated or edited as part of this task."
+      ],
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "public-registration-create-endpoint",
+      "title": "Public registration creation endpoint",
+      "description": "Add a public POST /api/registraties route that accepts JSON only and delegates business logic to a new registration service function createRegistration. The route handler should stay thin: parse JSON, validate the request body, call the service, and translate ServiceError, ZodError, and unknown errors using the existing API response pattern. The service should insert the registration through Drizzle and return the created registration. Add route/integration tests that prove successful creation returns a 200 response containing the created registration and that the row exists in the database.",
+      "acceptance_criteria": [
+        "POST /api/registraties accepts a valid JSON body with event_id, firstname, lastname, email, phonenumber, and label and returns HTTP 200.",
+        "The success response contains the created registration with its generated id and submitted field values.",
+        "A successful POST creates exactly one matching row in the registrations table.",
+        "POST /api/registraties with missing required fields returns HTTP 400 with the existing ZodError response shape { message: [...] }.",
+        "POST /api/registraties with malformed JSON or a non-JSON body returns HTTP 400 or another explicit client error response, not an unhandled 500.",
+        "The route handler does not contain Drizzle queries directly; database work is performed through createRegistration in the registration service module.",
+        "Route tests for the success path and required-field validation live under __tests__/routes/ and use Bun test conventions."
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "public-registration-business-rules",
+      "title": "Public registration business-rule rejections",
+      "description": "Complete createRegistration business rules in the service layer. Before inserting, verify that the submitted event exists, reject registrations for past events, and reject logged-in admin sessions using the public endpoint. Rely on the composite database constraints for duplicate same-event email and phone detection, translating those database errors into the PRD's Dutch 409 messages. Add route/integration tests and focused service-layer tests for these rules, including proof that the same email and same phone number can be used for different events.",
+      "acceptance_criteria": [
+        "POST /api/registraties for a non-existing event_id returns HTTP 404 with a Dutch not-found message.",
+        "POST /api/registraties for a past event returns HTTP 400.",
+        "POST /api/registraties from a logged-in admin session returns HTTP 403 with message Admins kunnen zich niet inschrijven via dit formulier.",
+        "Registering twice for the same event with the same email returns HTTP 409 with message Dit e-mailadres is al ingeschreven voor dit evenement.",
+        "Registering twice for the same event with the same phonenumber returns HTTP 409 with message Dit telefoonnummer is al ingeschreven voor dit evenement.",
+        "The same email address can register for two different events and both rows are persisted.",
+        "The same phone number can register for two different events and both rows are persisted.",
+        "Service-layer tests cover event existence checks, past-event rejection, duplicate constraint translation, and the cross-event duplicate allowance without asserting private implementation details."
+      ],
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "admin-event-registration-listing",
+      "title": "Admin event registration listing",
+      "description": "Add an admin-only GET /api/evenementen/[id]/registraties route backed by getRegistrationsForEvent in the registration service module. The service should verify an authenticated admin session, verify the event exists, and return basic event context plus all registrations for that event. The response should include the event title and date and a registrations array so the future UI can use registrations.length for counts. Add route/integration tests for successful admin listing, unauthenticated rejection, non-admin rejection where helpers support it, invalid IDs, non-existing events, and response shape.",
+      "acceptance_criteria": [
+        "GET /api/evenementen/[id]/registraties with an admin session returns HTTP 200.",
+        "The response includes an event object or event fields containing the requested event title and date.",
+        "The response includes a registrations array containing only registrations for the requested event.",
+        "The response does not include registrations from other events.",
+        "Unauthenticated requests to GET /api/evenementen/[id]/registraties are rejected with HTTP 401 or 403 following the existing project auth pattern.",
+        "Authenticated non-admin requests are rejected with HTTP 403 where the test helpers support a non-admin session.",
+        "Invalid event IDs return HTTP 400 through route parameter validation.",
+        "Non-existing event IDs return HTTP 404 with a Dutch not-found message.",
+        "The route handler remains thin and performs database access through getRegistrationsForEvent."
+      ],
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "admin-registration-deletion",
+      "title": "Admin registration deletion",
+      "description": "Add an admin-only DELETE /api/registraties/[id] route backed by deleteRegistrationById in the registration service module. The service should verify an authenticated admin session, check whether the registration exists, permanently delete the row, and log useful audit context for forbidden attempts where practical. The route should parse and validate the id parameter and translate ServiceError and ZodError using the existing API pattern. Add route/integration tests for successful deletion, database side effects, unauthenticated rejection, non-admin rejection where helpers support it, invalid IDs, and not-found registrations.",
+      "acceptance_criteria": [
+        "DELETE /api/registraties/[id] with an admin session for an existing registration returns HTTP 200.",
+        "A successful DELETE permanently removes the registration row from the registrations table.",
+        "Unauthenticated requests to DELETE /api/registraties/[id] are rejected with HTTP 401 or 403 following the existing project auth pattern.",
+        "Authenticated non-admin requests are rejected with HTTP 403 where the test helpers support a non-admin session.",
+        "Invalid registration IDs return HTTP 400 through route parameter validation.",
+        "Deleting a non-existing registration returns HTTP 404 with a Dutch not-found message.",
+        "The route handler remains thin and performs database access through deleteRegistrationById.",
+        "Service-layer tests cover admin authorization and database deletion behavior directly."
+      ],
+      "priority": 5,
+      "passes": false
+    }
+  ]
+}
