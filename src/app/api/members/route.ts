@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         }
         if (error instanceof ZodError){
             return NextResponse.json(
-                { message: error.issues.map(i => i.message) }, 
+                { message: error.issues.map(i => i.message) },
                 { status: 400 }
             );
         }
@@ -31,22 +31,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: NextRequest) {
     try {
-        const formData = await request.formData();
         const { headers } = request;
+          const member = await request.json();
 
-        const member = Object.fromEntries(formData.entries());
-        const goodMember = {
-            ...member,
-            has_payed: member.has_payed.toLowerCase() === "true",
-            is_student: member.is_student.toLowerCase() === "true",
-            address_id: Number(member.address_id)
-        }
-        
-        const validData = MemberInsertSchema.parse(goodMember);
+          const validData = MemberInsertSchema.parse(member);
 
-        const createdMember = await memberService.create(validData, headers);
-        return NextResponse.json({ member: createdMember })
-
+          const createdMember = await memberService.create(validData, headers);
+          return NextResponse.json({ member: createdMember });
     } catch(error){
       if (error instanceof ServiceError) {
           return NextResponse.json(
@@ -56,7 +47,7 @@ export async function POST(request: NextRequest) {
       }
       if (error instanceof ZodError){
           return NextResponse.json(
-              { message: error.issues.map(i => i.message) }, 
+              { message: error.issues.map(i => i.message) },
               { status: 400 }
           );
       }

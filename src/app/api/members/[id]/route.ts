@@ -24,7 +24,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         }
         if (error instanceof ZodError){
             return NextResponse.json(
-                { message: error.issues.map(i => i.message) }, 
+                { message: error.issues.map(i => i.message) },
                 { status: 400 }
             );
         }
@@ -39,15 +39,14 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     try {
         const { id } = await params;
         const { headers } = request;
-        const formData = await request.formData();
 
         const result = MemberByIdQuerySchema.parse({id});
-        const memberData = Object.fromEntries(formData.entries());
+        const memberData = await request.json();
         const validatedMember = MemberUpdateSchema.parse(memberData);
 
-        const updatedEvent = await memberService.updateById(result.id, validatedMember, headers);
-        
-        return NextResponse.json(updatedEvent); 
+        const updatedMember = await memberService.updateById(result.id, validatedMember, headers);
+
+        return NextResponse.json(updatedMember);
     } catch (error) {
         if (error instanceof ServiceError) {
             return NextResponse.json(
@@ -57,7 +56,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         }
         if (error instanceof ZodError){
             return NextResponse.json(
-                { message: error.issues.map(i => i.message) }, 
+                { message: error.issues.map(i => i.message) },
                 { status: 400 }
             );
         }
@@ -86,7 +85,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         }
         if (error instanceof ZodError){
             return NextResponse.json(
-                { message: error.issues.map(i => i.message) }, 
+                { message: error.issues.map(i => i.message) },
                 { status: 400 }
             );
         }

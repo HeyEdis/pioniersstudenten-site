@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * SEE: https://orm.drizzle.team/docs/zod
  * The createSelect/Insert/Update schema imports, create validation schema's to be used throughout the project.
- * 
+ *
  * SELECT schema: Defines the shape of data queried from the database - can be used to validate API responses.
  * INSERT schema: Defines the shape of data to be inserted into the database - can be used to validate API requests.
  * UPDATE schema: Defines the shape of data to be updated in the database - can be used to validate API requests.
@@ -31,11 +31,11 @@ export const EventSelectSchema = createSelectSchema(event,{
 export const NotificationSelectSchema = createSelectSchema(notification);
 
 export const MemberInsertSchema = createInsertSchema(members, {
-    firstname: z.string().trim().nonempty("voornaam mag niet leeg zijn."),
-    lastname: z.string().trim().nonempty("voornaam mag niet leeg zijn."),
+    firstname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
     gender: z.enum(["Male", "Female"]),
-    email: z.string().nonempty("email is verplicht."),
-    phonenumber: z.string().trim().max(14).nonempty("gsm-nummer mag niet leeg zijn."),
+    email: z.string().nonempty("Email is verplicht."),
+    phonenumber: z.string().trim().max(14).nonempty("Gsm-nummer mag niet leeg zijn."),
     address_id: z.number().positive(),
     has_payed: z.boolean(),
     is_student: z.boolean(),
@@ -56,7 +56,16 @@ export const EventInsertSchema = createInsertSchema(event,{
 });
 export const NotificationInsertSchema = createInsertSchema(notification);
 
-export const MemberUpdateSchema = createUpdateSchema(members);
+export const MemberUpdateSchema = createUpdateSchema(members, {
+    firstname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    gender: z.enum(["Male", "Female"]),
+    email: z.string().nonempty("Email is verplicht."),
+    phonenumber: z.string().trim().max(14).nonempty("Gsm-nummer mag niet leeg zijn."),
+    address_id: z.number().positive(),
+    has_payed: z.boolean(),
+    is_student: z.boolean(),
+});
 export const AddressUpdateSchema = createUpdateSchema(address);
 export const FaqUpdateSchema = createUpdateSchema(faq);
 export const ResourceUpdateSchema = createUpdateSchema(resource);
