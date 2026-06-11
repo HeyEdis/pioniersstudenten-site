@@ -30,7 +30,16 @@ export const EventSelectSchema = createSelectSchema(event,{
 });
 export const NotificationSelectSchema = createSelectSchema(notification);
 
-export const MemberInsertSchema = createInsertSchema(members);
+export const MemberInsertSchema = createInsertSchema(members, {
+    firstname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("Achternaam mag niet leeg zijn."),
+    gender: z.enum(["Male", "Female"]),
+    email: z.string().nonempty("Email is verplicht."),
+    phonenumber: z.string().trim().max(14).nonempty("Gsm-nummer mag niet leeg zijn."),
+    address_id: z.number().positive(),
+    has_payed: z.boolean(),
+    is_student: z.boolean(),
+});
 export const AddressInsertSchema = createInsertSchema(address);
 export const FaqInsertSchema = createInsertSchema(faq);
 export const ResourceInsertSchema = createInsertSchema(resource);
@@ -47,7 +56,16 @@ export const EventInsertSchema = createInsertSchema(event,{
 });
 export const NotificationInsertSchema = createInsertSchema(notification);
 
-export const MemberUpdateSchema = createUpdateSchema(members);
+export const MemberUpdateSchema = createUpdateSchema(members, {
+    firstname: z.string().trim().nonempty("Voornaam mag niet leeg zijn."),
+    lastname: z.string().trim().nonempty("Achternaam mag niet leeg zijn."),
+    gender: z.enum(["Male", "Female"]),
+    email: z.string().nonempty("Email is verplicht."),
+    phonenumber: z.string().trim().max(14).nonempty("Gsm-nummer mag niet leeg zijn."),
+    address_id: z.number().positive(),
+    has_payed: z.boolean(),
+    is_student: z.boolean(),
+});
 export const AddressUpdateSchema = createUpdateSchema(address);
 export const FaqUpdateSchema = createUpdateSchema(faq);
 export const ResourceUpdateSchema = createUpdateSchema(resource);
