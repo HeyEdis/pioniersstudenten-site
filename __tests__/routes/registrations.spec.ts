@@ -3,7 +3,7 @@ import { db } from "@/core/db";
 import { registrations } from "@/drizzle/schema";
 import { createRegistration } from "@/service/registrations";
 import { eq } from "drizzle-orm";
-import { makeRegistrationFixture } from "../fixtures/registrationFixture";
+import { marieRegistration, sofieRegistration } from "../fixtures/registrationFixture";
 
 const base_url = process.env.BETTER_AUTH_URL;
 const createdRegistrationIds: number[] = [];
@@ -30,7 +30,7 @@ const postRegistration = (body: unknown) => {
 
 describe("Registration service", () => {
   it("creates a registration", async () => {
-    const registrationData = makeRegistrationFixture();
+    const registrationData = marieRegistration;
 
     const created = await createRegistration(registrationData);
     trackRegistration(created.id);
@@ -50,7 +50,7 @@ describe("Registration service", () => {
   });
 
   it("translates database insert errors", async () => {
-    const registrationData = makeRegistrationFixture();
+    const registrationData = marieRegistration;
 
     const created = await createRegistration(registrationData);
     trackRegistration(created.id);
@@ -63,7 +63,7 @@ describe("Registration service", () => {
 
 describe("Registration routes", () => {
   it("creates a registration from JSON", async () => {
-    const registrationData = makeRegistrationFixture();
+    const registrationData = sofieRegistration;
 
     const response = await postRegistration(registrationData);
 
@@ -88,7 +88,7 @@ describe("Registration routes", () => {
 
   it("rejects missing required fields", async () => {
     const response = await postRegistration({
-      ...makeRegistrationFixture(),
+      ...marieRegistration,
       firstname: undefined,
     });
 
