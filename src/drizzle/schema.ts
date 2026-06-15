@@ -3,7 +3,7 @@ import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar
 
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
-export const pioneerLabel = pgEnum("pioneerLabel",["Aspirante pioniersstudent", "Pioniersstudent"]);
+export const pioneerLabel = pgEnum("pioneerLabel",["Toekomstige pioniersstudent", "Pioniersstudent"]);
 export const userRole = pgEnum("userRole", ["Admin", "User"]);
 
 const timestamps = {

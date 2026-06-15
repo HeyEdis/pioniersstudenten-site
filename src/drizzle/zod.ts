@@ -18,7 +18,7 @@ export const ResourceSelectSchema = createSelectSchema(resource);
 export const AdminSelectSchema = createSelectSchema(admin);
 export const RegistrationSelectSchema = createSelectSchema(registrations);
 export const EventSelectSchema = createSelectSchema(event,{
-    label: z.enum(["Aspirante pioniersstudent", "Pioniersstudent"]),
+    label: z.enum(["Toekomstige pioniersstudent", "Pioniersstudent"]),
     title: z.string().trim().min(1).nonempty("Titel mag niet leeg zijn."),
     date: z.string().nonempty("Datum is verplicht."),
     start_time: z.string().nonempty("Starttijd is verplicht."),
@@ -46,7 +46,7 @@ export const ResourceInsertSchema = createInsertSchema(resource);
 export const AdminInsertSchema = createInsertSchema(admin);
 export const RegistrationInsertSchema = createInsertSchema(registrations);
 export const EventInsertSchema = createInsertSchema(event,{
-    label: z.enum(["Aspirante pioniersstudent", "Pioniersstudent"]),
+    label: z.enum(["Toekomstige pioniersstudent", "Pioniersstudent"]),
     title: z.string().trim().min(1).nonempty("Titel mag niet leeg zijn."),
     date: z.string().nonempty("Datum is verplicht."),
     start_time: z.string().nonempty("Starttijd is verplicht."),
@@ -72,7 +72,7 @@ export const ResourceUpdateSchema = createUpdateSchema(resource);
 export const AdminUpdateSchema = createUpdateSchema(admin);
 export const RegistrationUpdateSchema = createUpdateSchema(registrations);
 export const EventUpdateSchema = createUpdateSchema(event, {
-    label: z.enum(["Aspirante pioniersstudent", "Pioniersstudent"]),
+    label: z.enum(["Toekomstige pioniersstudent", "Pioniersstudent"]),
     title: z.string().trim().min(1).nonempty("Titel mag niet leeg zijn."),
     date: z.string().nonempty("Datum is verplicht."),
     start_time: z.string().nonempty("Starttijd is verplicht."),
