@@ -1,23 +1,38 @@
 import ServiceError from "@/core/serviceError";
 
 const handleDBError = (error : unknown) => {
+  if (
+    error instanceof Error &&
+    "cause" in error &&
+    error.cause instanceof Error
+  ) {
+    return handleDBError(error.cause);
+  }
+
   if (!(error instanceof Error) || !("code" in error)) {
     throw error;
   }
 
   const code = typeof error.code === "string" ? error.code : "";
+  const errno =
+    "errno" in error && typeof error.errno === "string" ? error.errno : "";
   const message = error.message;
+  const constraint =
+    "constraint" in error && typeof error.constraint === "string"
+      ? error.constraint
+      : "";
+  const details = `${constraint} ${message}`;
 
   /**
    * Unique constraint violation
    */
-  if (code === "23505") {
+  if (code === "23505" || errno === "23505") {
     switch (true) {
-      case message.includes('registrations_event_email_unique'):
+      case details.includes('registrations_event_email_unique'):
         throw ServiceError.conflict(
           'Dit e-mailadres is al ingeschreven voor dit evenement.',
         );
-      case message.includes('registrations_event_phonenumber_unique'):
+      case details.includes('registrations_event_phonenumber_unique'):
         throw ServiceError.conflict(
           'Dit telefoonnummer is al ingeschreven voor dit evenement.',
         );

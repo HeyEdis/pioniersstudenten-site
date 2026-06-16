@@ -1,12 +1,67 @@
 import { db } from "@/core/db";
+import { auth } from "@/core/auth";
 import { getLogger } from "@/core/logging";
-import { registrations } from "@/drizzle/schema";
+import ServiceError from "@/core/serviceError";
+import { event, registrations } from "@/drizzle/schema";
 import { Registration } from "@/drizzle/zod";
 import handleDBError from "./_handleDbErrors";
+import { eq } from "drizzle-orm";
 
-export const create = async (
+const toLocalDateString = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const normalizeEventDate = (eventDate: string) => {
+  const dateOnly = eventDate.split("T")[0];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+    return dateOnly;
+  }
+
+  return toLocalDateString(new Date(eventDate));
+};
+
+const isPastEventDate = (eventDate: string) => {
+  return normalizeEventDate(eventDate) < toLocalDateString(new Date());
+};
+
+export const createRegistration = async (
   params: typeof registrations.$inferInsert,
+  headers?: Headers,
 ): Promise<Registration> => {
+  const session = headers
+    ? await auth.api.getSession({
+        headers,
+      })
+    : null;
+
+  if (session?.user.role === "Admin") {
+    throw ServiceError.forbidden(
+      "Admins kunnen zich niet inschrijven via dit formulier.",
+    );
+  }
+
+  const [eventById] = await db
+    .select()
+    .from(event)
+    .where(eq(event.id, params.event_id));
+
+  if (!eventById) {
+    getLogger().warn(`Event ${params.event_id} wasn't found.`);
+    throw ServiceError.notFound(
+      `Evenement met ID ${params.event_id} is niet gevonden.`,
+    );
+  }
+
+  if (isPastEventDate(eventById.date)) {
+    throw ServiceError.badRequest(
+      "Inschrijven voor een afgelopen evenement is niet mogelijk.",
+    );
+  }
+
   try {
     const [created] = await db
       .insert(registrations)

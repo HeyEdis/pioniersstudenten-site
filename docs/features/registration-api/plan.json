@@ -84,7 +84,7 @@
         "Service-layer tests cover event existence checks, past-event rejection, duplicate constraint translation, and the cross-event duplicate allowance without asserting private implementation details."
       ],
       "priority": 3,
-      "passes": false
+      "passes": true
     },
     {
       "id": "admin-event-registration-listing",
