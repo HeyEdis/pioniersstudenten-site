@@ -7,26 +7,10 @@ import type { Registration } from "@/drizzle/zod";
 import type { EventRegistrationList } from "@/types/registration";
 import handleDBError from "./_handleDbErrors";
 import { eq } from "drizzle-orm";
+import dayjs from 'dayjs';
 
-const toLocalDateString = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
-
-const normalizeEventDate = (eventDate: string) => {
-  const dateOnly = eventDate.split("T")[0];
-  if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
-    return dateOnly;
-  }
-
-  return toLocalDateString(new Date(eventDate));
-};
-
-const isPastEventDate = (eventDate: string) => {
-  return normalizeEventDate(eventDate) < toLocalDateString(new Date());
+const isPastEventDate = (eventDate: string): boolean => {
+  return dayjs(eventDate).isBefore(dayjs().format("YYYY-MM-DD"));
 };
 
 export const createRegistration = async (

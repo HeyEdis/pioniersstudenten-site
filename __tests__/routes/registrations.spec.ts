@@ -20,6 +20,7 @@ import {
 } from "../fixtures/registrationFixture";
 import { cleanupAllSessions, createUserSession } from "../helpers/auth";
 import { createClient, createSessionHeaders } from "../helpers/setup";
+import dayjs from "dayjs";
 
 const base_url = process.env.BETTER_AUTH_URL;
 const createdRegistrationIds: number[] = [];
@@ -97,26 +98,16 @@ const getEventRegistrations = (eventId: number | string) => {
 };
 
 const createPastEvent = async () => {
-  return createEventWithDate("2020-01-01", "Verlopen registratie event");
+  const pastDate = dayjs().subtract(3).format('YYYY-MM-DD');
+  return createEventWithDate(pastDate, "Verlopen registratie event");
 };
 
 const createFutureEvent = async () => {
-  const futureDate = new Date();
-  futureDate.setDate(futureDate.getDate() + 30);
-
-  return createEventWithDate(
-    toLocalDateString(futureDate),
-    "Toekomstig registratie event",
-  );
+  const futureDate = dayjs().add(30).format('YYYY-MM-DD');
+  return createEventWithDate(futureDate, "Toekomstig registratie event");
 };
 
-const toLocalDateString = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
+const currentDate = dayjs().format('YYYY-MM-DD');
 
 const createEventWithDate = async (date: string, titlePrefix: string) => {
   const [pastEvent] = await db
@@ -203,9 +194,7 @@ describe("Registration service", () => {
   });
 
   it("allows registrations for an event happening today", async () => {
-    const todayEvent = await createEventWithDate(
-      toLocalDateString(new Date()),
-      "Registratie event vandaag",
+    const todayEvent = await createEventWithDate(currentDate, "Registratie event vandaag",
     );
 
     const created = await createRegistration({
