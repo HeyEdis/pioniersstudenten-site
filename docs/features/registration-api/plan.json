@@ -102,7 +102,7 @@
         "The route handler remains thin and performs database access through getRegistrationsForEvent."
       ],
       "priority": 4,
-      "passes": false
+      "passes": true
     },
     {
       "id": "admin-registration-deletion",

@@ -3,9 +3,14 @@ import { auth } from "@/core/auth";
 import { getLogger } from "@/core/logging";
 import ServiceError from "@/core/serviceError";
 import { event, registrations } from "@/drizzle/schema";
-import { Registration } from "@/drizzle/zod";
+import { Event, Registration } from "@/drizzle/zod";
 import handleDBError from "./_handleDbErrors";
 import { eq } from "drizzle-orm";
+
+type EventRegistrationList = {
+  event: Pick<Event, "id" | "title" | "date">;
+  registrations: Registration[];
+};
 
 const toLocalDateString = (date: Date) => {
   const year = date.getFullYear();
@@ -74,4 +79,42 @@ export const createRegistration = async (
     getLogger().error(error);
     throw handleDBError(error);
   }
+};
+
+export const getRegistrationsForEvent = async (
+  eventId: number,
+  headers: Headers,
+): Promise<EventRegistrationList> => {
+  const session = await auth.api.getSession({ headers });
+
+  if (session?.user.role !== "Admin") {
+    throw ServiceError.forbidden("Gebruiker heeft geen toegang.");
+  }
+
+  const [eventById] = await db
+    .select({
+      id: event.id,
+      title: event.title,
+      date: event.date,
+    })
+    .from(event)
+    .where(eq(event.id, eventId));
+
+  if (!eventById) {
+    getLogger().warn(`Event ${eventId} wasn't found.`);
+    throw ServiceError.notFound(
+      `Evenement met ID ${eventId} is niet gevonden.`,
+    );
+  }
+
+  const eventRegistrations = await db
+    .select()
+    .from(registrations)
+    .where(eq(registrations.event_id, eventId))
+    .orderBy(registrations.id);
+
+  return {
+    event: eventById,
+    registrations: eventRegistrations,
+  };
 };

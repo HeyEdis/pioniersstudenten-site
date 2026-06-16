@@ -9,14 +9,17 @@ import {
 } from "bun:test";
 import { db } from "@/core/db";
 import { event, registrations } from "@/drizzle/schema";
-import { createRegistration } from "@/service/registrations";
+import {
+  createRegistration,
+  getRegistrationsForEvent,
+} from "@/service/registrations";
 import { eq, inArray } from "drizzle-orm";
 import {
   marieRegistration,
   sofieRegistration,
 } from "../fixtures/registrationFixture";
 import { cleanupAllSessions, createUserSession } from "../helpers/auth";
-import { createClient } from "../helpers/setup";
+import { createClient, createSessionHeaders } from "../helpers/setup";
 
 const base_url = process.env.BETTER_AUTH_URL;
 const createdRegistrationIds: number[] = [];
@@ -83,6 +86,14 @@ const postRegistrationAsAdmin = (body: unknown) => {
     },
     body: JSON.stringify(body),
   });
+};
+
+const getEventRegistrationsAsAdmin = (eventId: number | string) => {
+  return adminClient(`${base_url}/api/evenementen/${eventId}/registraties`);
+};
+
+const getEventRegistrations = (eventId: number | string) => {
+  return fetch(`${base_url}/api/evenementen/${eventId}/registraties`);
 };
 
 const createPastEvent = async () => {
@@ -257,6 +268,59 @@ describe("Registration service", () => {
 
     expect(persistedPhoneRegistrations).toHaveLength(2);
   });
+
+  it("returns event context and registrations for one event to admins", async () => {
+    const registrationEvent = await createFutureEvent();
+    const otherEvent = await createFutureEvent();
+    const firstRegistration = await createRegistration({
+      ...marieRegistration,
+      event_id: registrationEvent.id,
+    });
+    trackRegistration(firstRegistration.id);
+    const secondRegistration = await createRegistration({
+      ...sofieRegistration,
+      event_id: registrationEvent.id,
+    });
+    trackRegistration(secondRegistration.id);
+    const otherRegistration = await createRegistration({
+      ...marieRegistration,
+      event_id: otherEvent.id,
+    });
+    trackRegistration(otherRegistration.id);
+    const headers = await createSessionHeaders("Admin", 1);
+
+    const result = await getRegistrationsForEvent(registrationEvent.id, headers);
+
+    expect(result.event.title).toBe(registrationEvent.title);
+    expect(result.event.date).toBe(registrationEvent.date);
+    expect(result.registrations).toHaveLength(2);
+    expect(result.registrations.map((registration) => registration.id)).toEqual(
+      expect.arrayContaining([firstRegistration.id, secondRegistration.id]),
+    );
+    expect(
+      result.registrations.map((registration) => registration.id),
+    ).not.toContain(otherRegistration.id);
+  });
+
+  it("rejects event registration listing without an admin session", async () => {
+    await expect(
+      getRegistrationsForEvent(1, new Headers()),
+    ).rejects.toMatchObject({
+      status: 403,
+      message: "Gebruiker heeft geen toegang.",
+    });
+  });
+
+  it("rejects event registration listing when the event does not exist", async () => {
+    const headers = await createSessionHeaders("Admin", 1);
+
+    await expect(
+      getRegistrationsForEvent(999999, headers),
+    ).rejects.toMatchObject({
+      status: 404,
+      message: "Evenement met ID 999999 is niet gevonden.",
+    });
+  });
 });
 
 describe("Registration routes", () => {
@@ -272,7 +336,9 @@ describe("Registration routes", () => {
     trackRegistration(responseBody.registration.id);
 
     expect(responseBody.registration.email).toBe(registrationData.email);
-    expect(responseBody.registration.phonenumber).toBe(registrationData.phonenumber);
+    expect(responseBody.registration.phonenumber).toBe(
+      registrationData.phonenumber,
+    );
     expect(responseBody.registration.label).toBe(registrationData.label);
 
     const [registrationInDb] = await db
@@ -412,4 +478,86 @@ describe("Registration routes", () => {
     );
   });
 
+  it("lists registrations for one event as admin", async () => {
+    const registrationEvent = await createFutureEvent();
+    const otherEvent = await createFutureEvent();
+    const firstRegistration = await createRegistration({
+      ...marieRegistration,
+      event_id: registrationEvent.id,
+    });
+    trackRegistration(firstRegistration.id);
+    const secondRegistration = await createRegistration({
+      ...sofieRegistration,
+      event_id: registrationEvent.id,
+    });
+    trackRegistration(secondRegistration.id);
+    const otherRegistration = await createRegistration({
+      ...marieRegistration,
+      event_id: otherEvent.id,
+    });
+    trackRegistration(otherRegistration.id);
+
+    const response = await getEventRegistrationsAsAdmin(registrationEvent.id);
+
+    expect(response.ok).toBe(true);
+    expect(response.status).toBe(200);
+
+    const responseBody = await response.json();
+    expect(responseBody.event.title).toBe(registrationEvent.title);
+    expect(responseBody.event.date).toBe(registrationEvent.date);
+    expect(responseBody.registrations).toHaveLength(2);
+    expect(
+      responseBody.registrations.map(
+        (registration: { id: number }) => registration.id,
+      ),
+    ).toEqual(
+      expect.arrayContaining([firstRegistration.id, secondRegistration.id]),
+    );
+    expect(
+      responseBody.registrations.map(
+        (registration: { id: number }) => registration.id,
+      ),
+    ).not.toContain(otherRegistration.id);
+  }, 15_000);
+
+  it("rejects unauthenticated event registration listing", async () => {
+    const response = await getEventRegistrations(1);
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(403);
+
+    const responseBody = await response.json();
+    expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");
+  });
+
+  it("rejects invalid event IDs for registration listing", async () => {
+    const response = await getEventRegistrationsAsAdmin("abc");
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(400);
+
+    const responseBody = await response.json();
+    expect(responseBody).toEqual({
+      message: expect.arrayContaining([expect.any(String)]),
+    });
+  });
+
+  it("rejects negative event IDs for registration listing", async () => {
+    const response = await getEventRegistrationsAsAdmin("-1");
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(400);
+  });
+
+  it("rejects registration listing for an event that does not exist", async () => {
+    const response = await getEventRegistrationsAsAdmin(999999);
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(404);
+
+    const responseBody = await response.json();
+    expect(responseBody.message).toBe(
+      "Evenement met ID 999999 is niet gevonden.",
+    );
+  });
 });

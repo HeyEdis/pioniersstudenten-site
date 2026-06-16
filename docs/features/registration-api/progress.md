@@ -47,3 +47,14 @@ Keep entries concise. This file helps future iterations skip exploration.
 - Pinned Next's project root in `next.config.ts` with `outputFileTracingRoot` and `turbopack.root` because the required build loop otherwise inferred the parent `C:\Users\Armour` directory from an unrelated parent `package-lock.json` and crashed before app code ran.
 - Verification: `bun run build` passed after allowing network access for `next/font` Google Fonts; `bun lint` passed with the existing config export warnings; focused registration spec passed with 15 tests/0 failures when run against `next dev --webpack`.
 - Blocker: `bun dev:test` still crashes in this local tool runner with a Turbopack watcher panic for `C:\Users\Armour`, and detached `next dev --webpack` / `next start` processes do not stay alive long enough for a full `bun test` route-suite run here. A full `bun test` attempt therefore failed with connection refused across existing event/member/registration route tests, while non-server tests and the registration service tests passed.
+
+## 2026-06-16 - admin-event-registration-listing
+
+- Completed the admin event registration listing task.
+- Added `GET /api/evenementen/[id]/registraties` as a thin route that validates a positive event ID, delegates to `getRegistrationsForEvent`, and translates `ServiceError`, `ZodError`, and unknown errors using the existing API response pattern.
+- Added `getRegistrationsForEvent` to `src/service/registrations.ts`, including admin authorization, event existence checks, event title/date context, and registration filtering by requested event.
+- Added `EventRegistrationsByEventIdQuerySchema` for route-local positive ID validation without changing existing event route behavior.
+- Refactored `__tests__/helpers/setup.ts` to expose reusable authenticated session headers, so route clients and direct service tests share the same auth setup.
+- Added service and route coverage for successful admin listing, event context, excluding other-event registrations, unauthenticated rejection, invalid IDs, negative IDs, and non-existing events.
+- Ralph HITL script note: `bash scripts/ralph.sh --hitl --yolo --feature=registration-api` started but failed because `codex` was not available on the bash PATH in this Windows shell; the same HITL iteration was executed manually in this session.
+- Verification: `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 83 tests/0 failures while a temporary `next dev --webpack` test server was running.
