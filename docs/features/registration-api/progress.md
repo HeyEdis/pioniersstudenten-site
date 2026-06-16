@@ -58,3 +58,9 @@ Keep entries concise. This file helps future iterations skip exploration.
 - Added service and route coverage for successful admin listing, event context, excluding other-event registrations, unauthenticated rejection, invalid IDs, negative IDs, and non-existing events.
 - Ralph HITL script note: `bash scripts/ralph.sh --hitl --yolo --feature=registration-api` started but failed because `codex` was not available on the bash PATH in this Windows shell; the same HITL iteration was executed manually in this session.
 - Verification: `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 83 tests/0 failures while a temporary `next dev --webpack` test server was running.
+
+## 2026-06-16 - HITL review: move registration response type
+
+- Moved `EventRegistrationList` out of `src/service/registrations.ts` into `src/types/registration.ts`, following the referenced project pattern of domain-specific exported interfaces under `src/types`.
+- Updated `getRegistrationsForEvent` to import the response shape as a type instead of declaring it in the service layer.
+- Verification: `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 83 tests/0 failures while a temporary `next dev --webpack` test server was running.

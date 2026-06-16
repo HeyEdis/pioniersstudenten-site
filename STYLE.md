@@ -219,6 +219,51 @@ export const CreateRegistrationSchema = z.object({
 Why it is bad: registration creation is a table-backed insert contract, so it
 belongs with the Drizzle-derived schemas in `src/drizzle/zod.ts`.
 
+## Types
+
+Do not litter the service layer with separate type files. Shared exported types
+that are not Drizzle/Zod-inferred table types belong in `src/types/<domain>.ts`.
+
+Use this split:
+
+- `src/drizzle/zod.ts` owns table-backed inferred types such as `Registration`,
+  `Event`, and `Member`.
+- `src/types/<domain>.ts` owns shared domain, request, response, and service
+  input/output types that are not direct Drizzle/Zod table contracts.
+- `src/service/*.ts` owns service functions, local helper functions, and small
+  private implementation details.
+
+Do not create files like `src/service/registrationTypes.ts`,
+`src/service/types.ts`, or `src/service/registrations.types.ts`.
+
+Good:
+
+```ts
+// src/types/registration.ts
+import type { Registration } from "@/drizzle/zod";
+
+export interface RegistrationListResponse {
+  registrations: Registration[];
+}
+```
+
+```ts
+// src/service/registrations.ts
+import type { RegistrationListResponse } from "@/types/registration";
+```
+
+Bad:
+
+```ts
+// src/service/registrations.types.ts
+export interface RegistrationListResponse {
+  registrations: unknown[];
+}
+```
+
+Why it is bad: service-adjacent type files make the service layer harder to
+scan and scatter shared contracts across implementation folders.
+
 ## Database Schema
 
 Define tables, enums, relations, and the exported `schema` object in
@@ -363,6 +408,8 @@ When adding frontend work:
 - Do not use barrel files. Import from the concrete module that owns the export,
   such as `@/service/registrations`.
 - Keep validation messages near the schema that owns the contract.
+- Keep shared exported types out of `src/service/`; use `src/types/<domain>.ts`
+  unless the type is a Drizzle/Zod-inferred table type.
 - Keep business error messages in services, not routes.
 - Keep database constraint translation in `handleDBError`.
 - Avoid noisy debug logs. Remove client-side `console.log()` calls before

@@ -3,14 +3,10 @@ import { auth } from "@/core/auth";
 import { getLogger } from "@/core/logging";
 import ServiceError from "@/core/serviceError";
 import { event, registrations } from "@/drizzle/schema";
-import { Event, Registration } from "@/drizzle/zod";
+import type { Registration } from "@/drizzle/zod";
+import type { EventRegistrationList } from "@/types/registration";
 import handleDBError from "./_handleDbErrors";
 import { eq } from "drizzle-orm";
-
-type EventRegistrationList = {
-  event: Pick<Event, "id" | "title" | "date">;
-  registrations: Registration[];
-};
 
 const toLocalDateString = (date: Date) => {
   const year = date.getFullYear();
