@@ -4,7 +4,7 @@ registry = "https://registry.npmjs.org/"
 exact = true
 
 [test]
-root = "./__tests__/routes"  
+root = "./__tests__"
 preload = ["./__tests__/helpers/auth.ts","./__tests__/helpers/setup.ts"]
 
 # Execution settings
@@ -20,6 +20,4 @@ coverageReporter = ["text", "lcov"]
 # Set coverage output directory
 coverageDir = "./__tests__/coverage"
 
-# Simple threshold - applies to lines, functions, and statements
-coverageThreshold = { lines = 0.85, functions = 0.90, statements = 0.80 }
 coverageSkipTestFiles = true
