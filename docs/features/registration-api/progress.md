@@ -81,3 +81,10 @@ Keep entries concise. This file helps future iterations skip exploration.
 - Removed the disposable test-only non-admin account/client setup from `__tests__/routes/registrations.spec.ts`.
 - Removed the `rejects non-admin registration deletion` route test because registrations do not currently have a real non-admin account workflow; kept unauthenticated rejection and admin deletion coverage.
 - Verification: focused registration spec reported 31 tests/0 failures while a temporary `next dev --webpack` server was running; `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 91 tests/0 failures while a temporary `next dev --webpack` test server was running.
+
+## 2026-06-17 - HITL review: simplify database error handling
+
+- Removed the recursive wrapped-error/`errno`/constraint aggregation logic from `src/service/_handleDbErrors.ts`.
+- Moved same-event duplicate registration email/phone rejection into explicit registration service checks before insert, keeping `handleDBError` focused on direct database errors.
+- Renamed duplicate registration service tests to describe the domain rejection instead of database insert translation internals.
+- Verification: focused registration spec reported 31 tests/0 failures while a temporary `next dev --webpack` server was running; `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 91 tests/0 failures while a temporary `next dev --webpack` test server was running.

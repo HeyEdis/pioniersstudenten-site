@@ -160,7 +160,7 @@ describe("Registration service", () => {
     expect(registrationInDb.email).toBe(registrationData.email);
   });
 
-  it("translates database insert errors", async () => {
+  it("rejects duplicate email addresses for the same event", async () => {
     const registrationData = marieRegistration;
 
     const created = await createRegistration(registrationData);
@@ -221,7 +221,7 @@ describe("Registration service", () => {
     expect(created.event_id).toBe(todayEvent.id);
   });
 
-  it("translates duplicate phone number database errors", async () => {
+  it("rejects duplicate phone numbers for the same event", async () => {
     const created = await createRegistration(marieRegistration);
     trackRegistration(created.id);
 

@@ -6,7 +6,7 @@ import { event, registrations, userRole } from "@/drizzle/schema";
 import type { Registration } from "@/drizzle/zod";
 import type { EventRegistrationList } from "@/types/registration";
 import handleDBError from "./_handleDbErrors";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import dayjs from "dayjs";
 
 const isPastEventDate = (eventDate: string): boolean => {
@@ -44,6 +44,38 @@ export const createRegistration = async (
   if (isPastEventDate(eventById.date)) {
     throw ServiceError.badRequest(
       "Inschrijven voor een afgelopen evenement is niet mogelijk.",
+    );
+  }
+
+  const [registrationWithEmail] = await db
+    .select({ id: registrations.id })
+    .from(registrations)
+    .where(
+      and(
+        eq(registrations.event_id, params.event_id),
+        eq(registrations.email, params.email),
+      ),
+    );
+
+  if (registrationWithEmail) {
+    throw ServiceError.conflict(
+      "Dit e-mailadres is al ingeschreven voor dit evenement.",
+    );
+  }
+
+  const [registrationWithPhoneNumber] = await db
+    .select({ id: registrations.id })
+    .from(registrations)
+    .where(
+      and(
+        eq(registrations.event_id, params.event_id),
+        eq(registrations.phonenumber, params.phonenumber),
+      ),
+    );
+
+  if (registrationWithPhoneNumber) {
+    throw ServiceError.conflict(
+      "Dit telefoonnummer is al ingeschreven voor dit evenement.",
     );
   }
 
