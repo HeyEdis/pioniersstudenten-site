@@ -7,9 +7,8 @@ import {
   expect,
   it,
 } from "bun:test";
-import { auth } from "@/core/auth";
 import { db } from "@/core/db";
-import { admin as adminTable, event, registrations } from "@/drizzle/schema";
+import { event, registrations } from "@/drizzle/schema";
 import {
   createRegistration,
   deleteRegistrationById,
@@ -32,8 +31,6 @@ const fixtureEmails = [
   sofieRegistration.email,
 ];
 let adminClient: Awaited<ReturnType<typeof createClient>>;
-let userClient: Awaited<ReturnType<typeof createClient>>;
-let testUserId: number | null = null;
 
 const trackRegistration = (id: number) => {
   createdRegistrationIds.push(id);
@@ -56,27 +53,7 @@ beforeEach(async () => {
 beforeAll(async () => {
   await cleanupAllSessions();
   await createUserSession(1);
-  await db
-    .delete(adminTable)
-    .where(eq(adminTable.email, "registration-user@example.com"));
-
-  await auth.api.signUpEmail({
-    body: {
-      email: "registration-user@example.com",
-      password: "password123",
-      name: "Registration User",
-    },
-  });
-
-  const [testUser] = await db
-    .update(adminTable)
-    .set({ role: "User" })
-    .where(eq(adminTable.email, "registration-user@example.com"))
-    .returning();
-
-  testUserId = testUser.id;
   adminClient = await createClient("Admin", 1);
-  userClient = await createClient("User", testUser.id);
 });
 
 afterEach(async () => {
@@ -91,9 +68,6 @@ afterEach(async () => {
 
 afterAll(async () => {
   await cleanupAllSessions();
-  if (testUserId) {
-    await db.delete(adminTable).where(eq(adminTable.id, testUserId));
-  }
 });
 
 const postRegistration = (body: unknown) => {
@@ -126,12 +100,6 @@ const getEventRegistrations = (eventId: number | string) => {
 
 const deleteRegistrationAsAdmin = (registrationId: number | string) => {
   return adminClient(`${base_url}/api/registraties/${registrationId}`, {
-    method: "DELETE",
-  });
-};
-
-const deleteRegistrationAsUser = (registrationId: number | string) => {
-  return userClient(`${base_url}/api/registraties/${registrationId}`, {
     method: "DELETE",
   });
 };
@@ -652,16 +620,6 @@ describe("Registration routes", () => {
 
   it("rejects unauthenticated registration deletion", async () => {
     const response = await deleteRegistration(1);
-
-    expect(response.ok).toBe(false);
-    expect(response.status).toBe(403);
-
-    const responseBody = await response.json();
-    expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");
-  });
-
-  it("rejects non-admin registration deletion", async () => {
-    const response = await deleteRegistrationAsUser(1);
 
     expect(response.ok).toBe(false);
     expect(response.status).toBe(403);

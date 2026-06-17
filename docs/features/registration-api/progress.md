@@ -75,3 +75,9 @@ Keep entries concise. This file helps future iterations skip exploration.
 - Preserved the existing uncommitted date-comparison fix in registration tests/service so events happening today are not treated as past events.
 - Ralph HITL script note: `codex` is still not available on the shell PATH in this Windows runner, so this HITL iteration was executed manually in the current session using the Ralph prompt and review workflow.
 - Verification: focused registration spec passed with 32 tests/0 failures while a temporary `next dev --webpack` server was running; `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 92 tests/0 failures while a temporary `next dev --webpack` test server was running.
+
+## 2026-06-17 - HITL review: remove non-admin deletion route case
+
+- Removed the disposable test-only non-admin account/client setup from `__tests__/routes/registrations.spec.ts`.
+- Removed the `rejects non-admin registration deletion` route test because registrations do not currently have a real non-admin account workflow; kept unauthenticated rejection and admin deletion coverage.
+- Verification: focused registration spec reported 31 tests/0 failures while a temporary `next dev --webpack` server was running; `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 91 tests/0 failures while a temporary `next dev --webpack` test server was running.
