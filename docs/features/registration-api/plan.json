@@ -119,7 +119,7 @@
         "Service-layer tests cover admin authorization and database deletion behavior directly."
       ],
       "priority": 5,
-      "passes": false
+      "passes": true
     }
   ]
 }

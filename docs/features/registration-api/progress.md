@@ -64,3 +64,14 @@ Keep entries concise. This file helps future iterations skip exploration.
 - Moved `EventRegistrationList` out of `src/service/registrations.ts` into `src/types/registration.ts`, following the referenced project pattern of domain-specific exported interfaces under `src/types`.
 - Updated `getRegistrationsForEvent` to import the response shape as a type instead of declaring it in the service layer.
 - Verification: `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 83 tests/0 failures while a temporary `next dev --webpack` test server was running.
+
+## 2026-06-17 - admin-registration-deletion
+
+- Completed the admin registration deletion task.
+- Added `DELETE /api/registraties/[id]` as a thin route that validates a positive registration ID, delegates to `deleteRegistrationById`, and translates `ServiceError`, `ZodError`, and unknown errors using the existing API response pattern.
+- Added `deleteRegistrationById` to `src/service/registrations.ts`, including admin authorization, registration existence checks, permanent deletion, forbidden-attempt logging, and database error translation.
+- Added `RegistrationByIdQuerySchema` under `src/app/api/schemas/registrations.ts` for route-local registration ID validation.
+- Added service and route coverage for successful admin deletion, persisted deletion side effects, unauthenticated rejection, non-admin rejection, invalid IDs, negative IDs, and missing registrations.
+- Preserved the existing uncommitted date-comparison fix in registration tests/service so events happening today are not treated as past events.
+- Ralph HITL script note: `codex` is still not available on the shell PATH in this Windows runner, so this HITL iteration was executed manually in the current session using the Ralph prompt and review workflow.
+- Verification: focused registration spec passed with 32 tests/0 failures while a temporary `next dev --webpack` server was running; `bun lint` passed with existing config export warnings; `bun run build` passed after allowing network access for `next/font` Google Fonts; full `bun test --env-file=.env.test` passed with 92 tests/0 failures while a temporary `next dev --webpack` test server was running.

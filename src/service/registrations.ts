@@ -2,15 +2,15 @@ import { db } from "@/core/db";
 import { auth } from "@/core/auth";
 import { getLogger } from "@/core/logging";
 import ServiceError from "@/core/serviceError";
-import { event, registrations } from "@/drizzle/schema";
+import { event, registrations, userRole } from "@/drizzle/schema";
 import type { Registration } from "@/drizzle/zod";
 import type { EventRegistrationList } from "@/types/registration";
 import handleDBError from "./_handleDbErrors";
 import { eq } from "drizzle-orm";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 const isPastEventDate = (eventDate: string): boolean => {
-  return dayjs(eventDate).isBefore(dayjs().format("YYYY-MM-DD"));
+  return dayjs(eventDate).isBefore(dayjs(), "day");
 };
 
 export const createRegistration = async (
@@ -97,4 +97,38 @@ export const getRegistrationsForEvent = async (
     event: eventById,
     registrations: eventRegistrations,
   };
+};
+
+export const deleteRegistrationById = async (
+  registrationId: number,
+  headers: Headers,
+): Promise<void> => {
+  const session = await auth.api.getSession({ headers });
+
+  if (session?.user.role !== userRole.enumValues[0]) {
+    getLogger().warn(
+      `Forbidden registration delete attempt for registration ${registrationId}.`,
+    );
+    throw ServiceError.forbidden("Gebruiker heeft geen toegang.");
+  }
+
+  const [registrationById] = await db
+    .select()
+    .from(registrations)
+    .where(eq(registrations.id, registrationId));
+
+  if (!registrationById) {
+    getLogger().warn(`Registration ${registrationId} wasn't found.`);
+    throw ServiceError.notFound(
+      `Inschrijving met ID ${registrationId} is niet gevonden.`,
+    );
+  }
+
+  try {
+    await db.delete(registrations).where(eq(registrations.id, registrationId));
+    getLogger().info(`200: Registration ${registrationId} is deleted.`);
+  } catch (error) {
+    getLogger().error(error);
+    throw handleDBError(error);
+  }
 };

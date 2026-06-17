@@ -7,10 +7,12 @@ import {
   expect,
   it,
 } from "bun:test";
+import { auth } from "@/core/auth";
 import { db } from "@/core/db";
-import { event, registrations } from "@/drizzle/schema";
+import { admin as adminTable, event, registrations } from "@/drizzle/schema";
 import {
   createRegistration,
+  deleteRegistrationById,
   getRegistrationsForEvent,
 } from "@/service/registrations";
 import { eq, inArray } from "drizzle-orm";
@@ -30,6 +32,8 @@ const fixtureEmails = [
   sofieRegistration.email,
 ];
 let adminClient: Awaited<ReturnType<typeof createClient>>;
+let userClient: Awaited<ReturnType<typeof createClient>>;
+let testUserId: number | null = null;
 
 const trackRegistration = (id: number) => {
   createdRegistrationIds.push(id);
@@ -52,7 +56,27 @@ beforeEach(async () => {
 beforeAll(async () => {
   await cleanupAllSessions();
   await createUserSession(1);
+  await db
+    .delete(adminTable)
+    .where(eq(adminTable.email, "registration-user@example.com"));
+
+  await auth.api.signUpEmail({
+    body: {
+      email: "registration-user@example.com",
+      password: "password123",
+      name: "Registration User",
+    },
+  });
+
+  const [testUser] = await db
+    .update(adminTable)
+    .set({ role: "User" })
+    .where(eq(adminTable.email, "registration-user@example.com"))
+    .returning();
+
+  testUserId = testUser.id;
   adminClient = await createClient("Admin", 1);
+  userClient = await createClient("User", testUser.id);
 });
 
 afterEach(async () => {
@@ -67,6 +91,9 @@ afterEach(async () => {
 
 afterAll(async () => {
   await cleanupAllSessions();
+  if (testUserId) {
+    await db.delete(adminTable).where(eq(adminTable.id, testUserId));
+  }
 });
 
 const postRegistration = (body: unknown) => {
@@ -97,17 +124,35 @@ const getEventRegistrations = (eventId: number | string) => {
   return fetch(`${base_url}/api/evenementen/${eventId}/registraties`);
 };
 
+const deleteRegistrationAsAdmin = (registrationId: number | string) => {
+  return adminClient(`${base_url}/api/registraties/${registrationId}`, {
+    method: "DELETE",
+  });
+};
+
+const deleteRegistrationAsUser = (registrationId: number | string) => {
+  return userClient(`${base_url}/api/registraties/${registrationId}`, {
+    method: "DELETE",
+  });
+};
+
+const deleteRegistration = (registrationId: number | string) => {
+  return fetch(`${base_url}/api/registraties/${registrationId}`, {
+    method: "DELETE",
+  });
+};
+
 const createPastEvent = async () => {
-  const pastDate = dayjs().subtract(3).format('YYYY-MM-DD');
+  const pastDate = dayjs().subtract(3, "day").format("YYYY-MM-DD");
   return createEventWithDate(pastDate, "Verlopen registratie event");
 };
 
 const createFutureEvent = async () => {
-  const futureDate = dayjs().add(30).format('YYYY-MM-DD');
+  const futureDate = dayjs().add(30, "day").format("YYYY-MM-DD");
   return createEventWithDate(futureDate, "Toekomstig registratie event");
 };
 
-const currentDate = dayjs().format('YYYY-MM-DD');
+const currentDate = dayjs().format("YYYY-MM-DD");
 
 const createEventWithDate = async (date: string, titlePrefix: string) => {
   const [pastEvent] = await db
@@ -194,7 +239,9 @@ describe("Registration service", () => {
   });
 
   it("allows registrations for an event happening today", async () => {
-    const todayEvent = await createEventWithDate(currentDate, "Registratie event vandaag",
+    const todayEvent = await createEventWithDate(
+      currentDate,
+      "Registratie event vandaag",
     );
 
     const created = await createRegistration({
@@ -308,6 +355,40 @@ describe("Registration service", () => {
     ).rejects.toMatchObject({
       status: 404,
       message: "Evenement met ID 999999 is niet gevonden.",
+    });
+  });
+
+  it("deletes a registration as an admin", async () => {
+    const created = await createRegistration(marieRegistration);
+    const headers = await createSessionHeaders("Admin", 1);
+
+    await deleteRegistrationById(created.id, headers);
+
+    const [registrationInDb] = await db
+      .select()
+      .from(registrations)
+      .where(eq(registrations.id, created.id));
+
+    expect(registrationInDb).toBeUndefined();
+  });
+
+  it("rejects registration deletion without an admin session", async () => {
+    await expect(
+      deleteRegistrationById(1, new Headers()),
+    ).rejects.toMatchObject({
+      status: 403,
+      message: "Gebruiker heeft geen toegang.",
+    });
+  });
+
+  it("rejects registration deletion when the registration does not exist", async () => {
+    const headers = await createSessionHeaders("Admin", 1);
+
+    await expect(
+      deleteRegistrationById(999999, headers),
+    ).rejects.toMatchObject({
+      status: 404,
+      message: "Inschrijving met ID 999999 is niet gevonden.",
     });
   });
 });
@@ -547,6 +628,76 @@ describe("Registration routes", () => {
     const responseBody = await response.json();
     expect(responseBody.message).toBe(
       "Evenement met ID 999999 is niet gevonden.",
+    );
+  });
+
+  it("deletes a registration as admin", async () => {
+    const created = await createRegistration(marieRegistration);
+
+    const response = await deleteRegistrationAsAdmin(created.id);
+
+    expect(response.ok).toBe(true);
+    expect(response.status).toBe(200);
+
+    const responseBody = await response.json();
+    expect(responseBody).toEqual({ id: created.id });
+
+    const [registrationInDb] = await db
+      .select()
+      .from(registrations)
+      .where(eq(registrations.id, created.id));
+
+    expect(registrationInDb).toBeUndefined();
+  }, 15_000);
+
+  it("rejects unauthenticated registration deletion", async () => {
+    const response = await deleteRegistration(1);
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(403);
+
+    const responseBody = await response.json();
+    expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");
+  });
+
+  it("rejects non-admin registration deletion", async () => {
+    const response = await deleteRegistrationAsUser(1);
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(403);
+
+    const responseBody = await response.json();
+    expect(responseBody.message).toBe("Gebruiker heeft geen toegang.");
+  });
+
+  it("rejects invalid registration IDs for deletion", async () => {
+    const response = await deleteRegistrationAsAdmin("abc");
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(400);
+
+    const responseBody = await response.json();
+    expect(responseBody).toEqual({
+      message: expect.arrayContaining([expect.any(String)]),
+    });
+  });
+
+  it("rejects negative registration IDs for deletion", async () => {
+    const response = await deleteRegistrationAsAdmin("-1");
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(400);
+  });
+
+  it("rejects deletion for a registration that does not exist", async () => {
+    const response = await deleteRegistrationAsAdmin(999999);
+
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(404);
+
+    const responseBody = await response.json();
+    expect(responseBody.message).toBe(
+      "Inschrijving met ID 999999 is niet gevonden.",
     );
   });
 });
