@@ -42,7 +42,7 @@ jobs:
 
       # 5. Connect via SSH to load and run the container
       - name: Deploy on Server
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
