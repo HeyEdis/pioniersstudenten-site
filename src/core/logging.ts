@@ -33,24 +33,36 @@ const loggerFormat = () => {
   );
 };
 
+export const createLoggerTransports = (appEnv: string) => {
+  if (appEnv === "test") {
+    return [
+      new winston.transports.File({
+        filename: `logs/testing/${dayjs().format("YYYY-MM-DD")}.log`,
+        silent: LOG_DISABLED,
+      }),
+    ];
+  }
+
+  if (appEnv === "development") {
+    return [
+      new winston.transports.File({
+        filename: `logs/dev/${dayjs().format("YYYY-MM-DD")}.log`,
+        silent: LOG_DISABLED,
+      }),
+      new winston.transports.Console({ silent: LOG_DISABLED }),
+    ];
+  }
+
+  return [
+    new winston.transports.Console({ silent: LOG_DISABLED }),
+  ];
+};
+
 const rootLogger: winston.Logger = winston.createLogger({
   level: LOG_LEVEL,
   format: loggerFormat(),
   defaultMeta: { env: APP_ENV },
-  transports: APP_ENV === "test" ? [
-    new winston.transports.File({
-      filename: `logs/testing/${dayjs().format("YYYY-MM-DD")}.log`,
-      silent: LOG_DISABLED,
-    }),
-  ] : APP_ENV === "development" ? [
-    new winston.transports.File({
-      filename: `logs/dev/${dayjs().format("YYYY-MM-DD")}.log`,
-      silent: LOG_DISABLED,
-    }),
-    new winston.transports.Console({ silent: LOG_DISABLED }),
-  ] : [
-    new winston.transports.Console({ silent: LOG_DISABLED }),
-  ],
+  transports: createLoggerTransports(APP_ENV),
 });
 
 export const getLogger = () => {

@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar, index } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgEnum, pgTable, text, time, timestamp, varchar, index, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const genderTypes = pgEnum("genderTypes", ["Male", "Female", "X"]);
 export const resourceTypes = pgEnum("resourceTypes", ["Studentenlink", "Ondersteuning"]);
@@ -74,16 +74,23 @@ export const admin = pgTable("admins", {
     .notNull(),
 });
 
-export const registrations = pgTable("registrations", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  event_id: integer("event_id").references(() => event.id, {onDelete: "cascade"}).notNull(), // given the id an FK constraint
-  firstname: varchar("firstname", {length: 50}).notNull(),
-  lastname: varchar("lastname", {length: 50}).notNull(),
-  email: varchar("email", {length: 255}).notNull().unique(),
-  phonenumber: varchar("phonenumber", {length:14}).notNull().unique(),
-  label: pioneerLabel("label"),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-});
+export const registrations = pgTable(
+  "registrations",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    event_id: integer("event_id").references(() => event.id, {onDelete: "cascade"}).notNull(), // given the id an FK constraint
+    firstname: varchar("firstname", {length: 50}).notNull(),
+    lastname: varchar("lastname", {length: 50}).notNull(),
+    email: varchar("email", {length: 255}).notNull(),
+    phonenumber: varchar("phonenumber", {length:14}).notNull(),
+    label: pioneerLabel("label").notNull(),
+    created_at: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("registrations_event_email_unique").on(table.event_id, table.email),
+    uniqueIndex("registrations_event_phonenumber_unique").on(table.event_id, table.phonenumber),
+  ],
+);
 
 // Many-to-one: maps the event_id to the event table primary key.
 export const registrationRelations = relations(registrations, ({one}) => ({

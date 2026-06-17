@@ -13,4 +13,5 @@ export const peterMemberUpdate = {
   ...peterMember,
   gender: "Female",
   email: "peter.spiessens69@example.com",
+  phonenumber: "+32472684298",
 };

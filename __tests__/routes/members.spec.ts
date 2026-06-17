@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll, afterAll } from "bun:test";
 import { cleanupAllSessions, createUserSession } from "../helpers/auth";
 import { createClient } from "../helpers/setup";
 import z from "zod";
-import { members } from "@/drizzle/schema";
+import { members, userRole } from "@/drizzle/schema";
 import { db } from "@/core/db";
 import { eq } from "drizzle-orm";
 import { peterMember, peterMemberUpdate } from "../fixtures/memberFixture";
@@ -16,7 +16,7 @@ describe("Member routes", () => {
     await cleanupAllSessions();
 
     await createUserSession(1);
-    adminClient = await createClient("Admin", 1);
+    adminClient = await createClient(userRole.enumValues[0], 1);
   })
 
   afterAll(async () => {
