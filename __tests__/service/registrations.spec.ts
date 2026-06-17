@@ -8,7 +8,7 @@ import {
   it,
 } from "bun:test";
 import { db } from "@/core/db";
-import { event, registrations } from "@/drizzle/schema";
+import { event, registrations, userRole } from "@/drizzle/schema";
 import {
   createRegistration,
   deleteRegistrationById,
@@ -248,7 +248,7 @@ describe("Registration service", () => {
       event_id: otherEvent.id,
     });
     trackRegistration(otherRegistration.id);
-    const headers = await createSessionHeaders("Admin", 1);
+    const headers = await createSessionHeaders(userRole.enumValues[0], 1);
 
     const result = await getRegistrationsForEvent(registrationEvent.id, headers);
 
@@ -273,7 +273,7 @@ describe("Registration service", () => {
   });
 
   it("rejects event registration listing when the event does not exist", async () => {
-    const headers = await createSessionHeaders("Admin", 1);
+    const headers = await createSessionHeaders(userRole.enumValues[0], 1);
 
     await expect(
       getRegistrationsForEvent(999999, headers),
@@ -285,7 +285,7 @@ describe("Registration service", () => {
 
   it("deletes a registration as an admin", async () => {
     const created = await createRegistration(marieRegistration);
-    const headers = await createSessionHeaders("Admin", 1);
+    const headers = await createSessionHeaders(userRole.enumValues[0], 1);
 
     await deleteRegistrationById(created.id, headers);
 
@@ -307,7 +307,7 @@ describe("Registration service", () => {
   });
 
   it("rejects registration deletion when the registration does not exist", async () => {
-    const headers = await createSessionHeaders("Admin", 1);
+    const headers = await createSessionHeaders(userRole.enumValues[0], 1);
 
     await expect(
       deleteRegistrationById(999999, headers),

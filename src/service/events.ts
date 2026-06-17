@@ -12,7 +12,7 @@ export const create = async(params: typeof event.$inferInsert, headers: Headers)
         headers: headers
     });
 
-    if (session?.user.role !== "Admin"){
+    if (session?.user.role !== userRole.enumValues[0]){
         throw ServiceError.forbidden("Gebruiker heeft geen toegang.")
     };
 

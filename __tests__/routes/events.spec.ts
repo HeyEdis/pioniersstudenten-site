@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll, afterAll } from "bun:test";
 import { cleanupAllSessions, createUserSession } from "../helpers/auth";
 import { createClient } from "../helpers/setup";
 import z from "zod";
-import { event } from "@/drizzle/schema";
+import { event, userRole } from "@/drizzle/schema";
 import { db } from "@/core/db";
 import { eq } from "drizzle-orm";
 
@@ -15,7 +15,7 @@ describe("Event routes", () => {
     await cleanupAllSessions();
 
     await createUserSession(1);
-    adminClient = await createClient("Admin", 1);
+    adminClient = await createClient(userRole.enumValues[0], 1);
   })
 
   afterAll(async () => {

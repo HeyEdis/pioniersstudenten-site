@@ -8,7 +8,7 @@ import {
   it,
 } from "bun:test";
 import { db } from "@/core/db";
-import { event, registrations } from "@/drizzle/schema";
+import { event, registrations, userRole } from "@/drizzle/schema";
 import { createRegistration } from "@/service/registrations";
 import { eq, inArray } from "drizzle-orm";
 import {
@@ -49,7 +49,7 @@ beforeEach(async () => {
 beforeAll(async () => {
   await cleanupAllSessions();
   await createUserSession(1);
-  adminClient = await createClient("Admin", 1);
+  adminClient = await createClient(userRole.enumValues[0], 1);
 });
 
 afterEach(async () => {

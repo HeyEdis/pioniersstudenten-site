@@ -119,6 +119,9 @@ Service functions should:
 - Use `ServiceError` for expected domain and authorization failures.
 - Use `ServiceError.unauthorized()` for missing/invalid authentication.
 - Use `ServiceError.forbidden()` for authenticated users without permission.
+- Keep authentication and authorization checks distinct. A missing session should
+  return `401`; a valid session without the required role or permission should
+  return `403`.
 - Keep authorization checks close to the query or mutation they protect.
 - Use `handleDBError` for known PostgreSQL constraint failures.
 - Use `getLogger()` for server-side logging.
@@ -130,7 +133,11 @@ Good:
 export const deleteById = async (eventId: number, headers: Headers): Promise<void> => {
   const session = await auth.api.getSession({ headers });
 
-  if (session?.user.role !== userRole.enumValues[0]) {
+  if (!session) {
+    throw ServiceError.unauthorized("Niet aangemeld.");
+  }
+
+  if (session.user.role !== userRole.enumValues[0]) {
     getLogger().warn(`Forbidden event delete attempt for event ${eventId}.`);
     throw ServiceError.forbidden("Gebruiker heeft geen toegang.");
   }

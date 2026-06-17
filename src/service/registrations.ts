@@ -23,7 +23,7 @@ export const createRegistration = async (
       })
     : null;
 
-  if (session?.user.role === "Admin") {
+  if (session?.user.role === userRole.enumValues[0]) {
     throw ServiceError.forbidden(
       "Admins kunnen zich niet inschrijven via dit formulier.",
     );
@@ -99,7 +99,7 @@ export const getRegistrationsForEvent = async (
 ): Promise<EventRegistrationList> => {
   const session = await auth.api.getSession({ headers });
 
-  if (session?.user.role !== "Admin") {
+  if (session?.user.role !== userRole.enumValues[0]) {
     throw ServiceError.forbidden("Gebruiker heeft geen toegang.");
   }
 
